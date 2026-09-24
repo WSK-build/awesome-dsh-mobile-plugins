@@ -1,0 +1,110 @@
+{
+ "https://github.com/agentscope-ai/ReMe/tree/main/integrations/dsh": {
+  "downloads": 289,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/bowenliang123/dsh-context": {
+  "downloads": 102444,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/DDDMUC/dsh-free-search": {
+  "downloads": 18099,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/Gin-7/dsh-pet-remielle": {
+  "downloads": 1306,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/kingOfSoySauce/dsh-skin-market": {
+  "downloads": 6181,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/Mars-Sea/dsh-commandcode-provider": {
+  "downloads": 10527,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/omdsh-dev/dsh-lark": {
+  "downloads": 1948,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/PolinniZhong/dsh-omi-voice": {
+  "downloads": 399,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/Small-tailqwq/dsh-deep-whale/tree/main/maid-atelier": {
+  "downloads": 3826,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/Tencent/WeKnora/tree/main/packages/dsh-weknora": {
+  "downloads": 3344,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/tong-io/tongflow/tree/main/packages/dsh-tongflow": {
+  "downloads": 1146,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/tt-a1i/archify/tree/main/integrations/deepseek-harness": {
+  "downloads": 14386,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/V1ki/dsh-plugin-subscriptions": {
+  "downloads": 8776,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/volcengine/OpenViking/tree/main/examples/dsh-memory-plugin": {
+  "downloads": 20585,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/yyh-001/dsh-meme": {
+  "downloads": 3580,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/zhu1090093659/dsh-web/tree/main/packages/dsh-git-graph": {
+  "downloads": 168086,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/zhu1090093659/dsh-web/tree/main/packages/dsh-skill-explorer": {
+  "downloads": 178535,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ },
+ "https://github.com/zhu1090093659/dsh-web/tree/main/packages/dsh-task-board": {
+  "downloads": 177366,
+  "checkedAt": "2026-09-24",
+  "start": "2026-08-25",
+  "end": "2026-09-23"
+ }
+}

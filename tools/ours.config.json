@@ -1,0 +1,60 @@
+{
+  "_说明": "本文件是「我们的补丁」的唯一来源：本地与 CI 同步上游代码后，都用 tools/apply-ours.mjs 重新打一遍。上游改了我们依赖的那行文本时，脚本会报 drift 并退出非零，避免静默把我们的改动冲掉。",
+  "_作用域": "补丁**只作用在 syncPaths 里的文件**上（这些正是从上游取过来的），并在其中跳过 neverSwap 列出的、属于我们自己的文件。这样我们自己的 tools/、署名文档、README 里对上游的正常引用不会被误改——第一次写这个脚本时就因为在全仓范围替换，把署名里的上游地址改成了我们自己的。",
+  "syncPaths": [
+    "scripts",
+    "site",
+    ".github",
+    "design-mocks",
+    "contributing.md",
+    "package.json",
+    "package-lock.json",
+    ".gitignore"
+  ],
+  "oursOwned": [
+    "site/template.html",
+    "site/detail-template.html",
+    "site/privacy-template.html",
+    "site/privacy.en.html",
+    "site/privacy.zh.html",
+    "site/locales.mjs",
+    "site/assets",
+    "contributing.md",
+    "scripts/generate-readme.mjs"
+  ],
+  "neverSwap": [
+    ".github/workflows/upstream-sync.yml"
+  ],
+  "identitySwaps": [
+    ["awesome-dsh-plugin/awesome-dsh-plugin", "WSK-build/awesome-dsh-mobile-plugins"],
+    ["awesome-dsh-plugin.com", "wsk-build.github.io/awesome-dsh-mobile-plugins"],
+    ["'awesome-dsh-plugin'", "'awesome-dsh-mobile-plugins'"],
+    ["\"awesome-dsh-plugin\"", "\"awesome-dsh-mobile-plugins\""],
+    ["dsh-plugin-catalog", "dsh-mobile-plugin-catalog"]
+  ],
+  "categoryRename": {
+    "fromId": "wsl",
+    "toId": "phone",
+    "fromEmoji": "🐧",
+    "toEmoji": "🕹️",
+    "fromLabelEn": "WSL & Windows Interop",
+    "toLabelEn": "Phone Control",
+    "fromLabelZh": "WSL 与 Windows 互操作",
+    "toLabelZh": "手机控制"
+  },
+  "_removePaths说明": "这些文件每次同步后都要删掉：上游有、但我们不要（自定义域名、字体、广告位、它自己的社交卡片）。删了之后 git add -A 会把删除入账，正好抵消取件时把它们带进索引。",
+  "removePaths": [
+    "site/assets/CNAME",
+    "site/assets/ads.txt",
+    "site/assets/archivo-latin.woff2",
+    "site/assets/archivo-latin-ext.woff2",
+    "site/assets/og-en.png",
+    "site/assets/og-zh.png"
+  ],
+  "_同步永不包含（含已删除项）": [
+    "data/（上游的条目与探测数据）",
+    "README.md / README.zh.md（由我们的 generate-readme.mjs 从我们的数据生成，正文含我们的署名段）",
+    "tools/（我们自己的脚本与配置）",
+    "THIRD_PARTY_NOTICES.md 等本地文档"
+  ]
+}

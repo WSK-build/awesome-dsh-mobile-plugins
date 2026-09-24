@@ -1,0 +1,79 @@
+name: Sync upstream code (no data)
+
+# 定点搬运上游的**代码 / 站点 / 脚本**更新，永不搬它的数据：
+#   - 只按 tools/ours.config.json 里的 syncPaths 取文件；
+#   - data/、README*.md 不在列表里，所以它的条目与探测数据进不来；
+#   - 取完立刻用 tools/apply-ours.mjs 重新打我们的补丁（身份串 + wsl→phone 分类），
+#     否则仓库名/域名/npm 包名会被改回它的、我们的分类会被还原；
+#   - 跑一遍自检（单测 + README 生成 + 站点构建）当门禁；
+#   - 最后**开 PR**，由人看过再合（要直推 main 就把最后一步的 gh pr create 换掉）。
+on:
+  schedule:
+    - cron: "40 3 * * 1"   # 每周一 03:40
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/WSK-build/awesome-dsh-mobile-plugins.git
+          git fetch --depth 1 upstream main
+      - name: Take upstream's code paths only
+        run: |
+          git checkout FETCH_HEAD -- $(node tools/apply-ours.mjs --print-sync-paths)
+      - name: Re-apply our patch (identity + category)
+        run: node tools/apply-ours.mjs
+      - run: npm ci
+      - name: Self-checks
+        run: |
+          node scripts/generate-readme.mjs
+          for f in scripts/*.test.mjs; do node --test "$f"; done
+          SKIP_PUBLISH_CHECKS=1 node scripts/build-site.mjs
+      - name: Stage and assert we never brought data or the CNAME
+        run: |
+          # 先 add -A 再断言：add 之前索引里还是"补丁前"的上游原文件，断言会误报
+          git add -A
+          # 数据与域名一律不许进来：这是本工作流存在的意义，所以要显式断言，不能只在文档里说
+          if git ls-files --error-unmatch site/assets/CNAME >/dev/null 2>&1; then
+            echo "❌ site/assets/CNAME 被带进索引（上游的自定义域名）"; exit 1
+          fi
+          if git diff --cached --name-only | grep -Eq '^(data/|README\.md|README\.zh\.md)'; then
+            echo "❌ 变更里出现了 data/ 或 README，超出取件范围"; git diff --cached --name-only; exit 1
+          fi
+          echo "取件范围校验通过：没有 data/、README、CNAME"
+
+      - name: Open a PR if anything changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --cached --quiet; then
+            echo "上游没有带来变化"
+            exit 0
+          fi
+          branch="chore/upstream-sync-${GITHUB_RUN_ID}"
+          git checkout -b "$branch"
+          git config user.name "catalog-bot"
+          git config user.email "catalog-bot@users.noreply.github.com"
+          git commit -m "chore: 同步上游代码/站点/脚本（身份与分类补丁已重新应用）"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "chore: 同步上游代码/站点/脚本" \
+            --body "自动同步 [awesome-dsh-plugin](https://github.com/WSK-build/awesome-dsh-mobile-plugins) 的代码/站点/脚本。
+
+- 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
+- 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）
+- 已通过：上游单测、README 重新生成、站点构建
+
+请人工过一眼上游这次改了什么再合。"
