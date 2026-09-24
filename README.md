@@ -29,7 +29,6 @@ English | [中文](README.zh.md)
   - [Remote & Mobile](#remote--mobile)
   - [Plugin Markets & Managers](#plugin-markets--managers)
   - [Just for Fun](#just-for-fun)
-- [Disclaimer](#disclaimer)
 <!-- END TOC -->
 
 ## Plugins
