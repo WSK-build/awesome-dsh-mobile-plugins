@@ -149,7 +149,12 @@ for (const loc of LOCALES) {
           if (e.description[loc.code] === undefined) untranslated.push(`${loc.readme}: ${e.url}`)
           return `- [${e.name}](${e.url}) ${loc.sep} ${escapeRefs(d)}`
         })
-      return `### ${headingFor(loc, id)}\n\n${lines.join('\n')}`
+      const heading = `### ${headingFor(loc, id)}`
+      // 空分类只输出标题：否则会连着留下多个空行，awesome-lint 的 no-multiple-blanks 会报错
+      return lines.length ? `${heading}
+
+${lines.join('
+')}` : heading
     })
     .join('\n\n')
 
