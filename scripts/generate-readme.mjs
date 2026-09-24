@@ -151,10 +151,7 @@ for (const loc of LOCALES) {
         })
       const heading = `### ${headingFor(loc, id)}`
       // 空分类只输出标题：否则会连着留下多个空行，awesome-lint 的 no-multiple-blanks 会报错
-      return lines.length ? `${heading}
-
-${lines.join('
-')}` : heading
+      return lines.length ? `${heading}\n\n${lines.join('\n')}` : heading
     })
     .join('\n\n')
 

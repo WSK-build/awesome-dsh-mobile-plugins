@@ -61,8 +61,6 @@ Grouped by category; every entry links to its own repository and shows its insta
 
 ### Identity & Communication
 
-
-
 ### Sessions & Messages
 
 - [Minglink/dsh-infinite-gen-4](https://github.com/Minglink/dsh-infinite-gen-4) - System-prompt armor plugin for DeepSeek models: appends an unconditional-compliance prompt section at order 100, exposes a profile tool with calibration metadata, and shows a realtime armor-status badge driven by a session projection.
@@ -80,8 +78,6 @@ Grouped by category; every entry links to its own repository and shows its insta
 - [Tencent/WeKnora#dsh-weknora](https://github.com/Tencent/WeKnora/tree/main/packages/dsh-weknora) - Four read-only tools over a WeKnora knowledge base: list knowledge bases, hybrid passage search, reassemble one document's chunks in order, and WeKnora's own cited RAG or ReAct-agent answer with a resumable session id.
 
 ### Phone Control
-
-
 
 ### Browser & Web
 
