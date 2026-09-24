@@ -1,27 +1,6 @@
-# awesome-dsh-mobile-plugins
-
-![插件数量](https://img.shields.io/endpoint?url=https%3A%2F%2Fwsk-build.github.io%2Fawesome-dsh-mobile-plugins%2Fcount.json&label=%E6%8F%92%E4%BB%B6)
+# Awesome DSH Mobile Plugins [![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![插件数量](https://img.shields.io/endpoint?url=https%3A%2F%2Fwsk-build.github.io%2Fawesome-dsh-mobile-plugins%2Fcount.json&label=%E6%8F%92%E4%BB%B6)
 
 [English](README.md) | 中文
-
-**中文版**
-
-DeepSeek Harness 移动端插件合集，专为手机端使用场景打造，汇集实用插件与扩展工具，让 AI 能力在移动设备上更加灵活、高效、触手可及。
-
-**English Version**
-
-A curated collection of mobile-friendly plugins and extensions for DeepSeek Harness, designed to bring a more seamless, flexible, and powerful AI experience to your fingertips.
-
-## 这个仓库是什么
-
-**专为移动端适配**的 `dsh` 插件索引。每条条目**只存元数据**：指向作者自己的仓库、说明它做什么、
-附一行可直接粘贴的安装命令。插件代码一律留在作者仓库里，这里不复制任何代码。
-
-一份 `plugins.json` 同时供本列表与站点
-[wsk-build.github.io/awesome-dsh-mobile-plugins](https://wsk-build.github.io/awesome-dsh-mobile-plugins) 读取；
-目录结构与上游精选列表**逐字段一致**，因此任何按该结构读取的市场客户端都能直接读它——[DSHBox](https://github.com/WSK-build/DSHBox)（DSH 移动端工作台，可一键安装/卸载本仓库收录插件）就是这么做的。
-
-有两点我们不作承诺：**收录不等于背书**；我们**无法做所有真机实测与安全性检测，安装时请核实插件安全性**。出现在这里只说明一件事——该条目已合并进本仓库。
 
 ## 目录
 
@@ -50,7 +29,6 @@ A curated collection of mobile-friendly plugins and extensions for DeepSeek Harn
   - [📱 远程与移动端](#-远程与移动端)
   - [🛒 插件市场与管理](#-插件市场与管理)
   - [🎮 娱乐](#-娱乐)
-- [徽章](#徽章)
 - [免责声明](#免责声明)
 <!-- END TOC -->
 
@@ -209,7 +187,5 @@ CI 会校验字段、文件名与仓库绑定；合并后本 README 与站点会
 本仓库是 **[awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的复刻（re-identification）**：
 以它的 `scripts/`、`site/` 模板、workflows 与包清单为基线；**除了把仓库身份换成本项目的，收录的条目与探测数据也全部换成本仓库自己的**。逐文件说明见
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；**它的条目与探测数据我们没有使用**。
-
-## 许可
 
 目录数据、脚本与文档以 **CC0-1.0** 发布，见 [LICENSE](LICENSE)：贡献即表示同意以相同方式奉献。
