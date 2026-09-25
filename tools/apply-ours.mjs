@@ -121,6 +121,28 @@ for (const target of CONFIG.removePaths) {
   }
 }
 
+// ── 3b) 剥掉上游同步带回来、但我们不要的工作流步骤 ──
+// 为什么需要：上游 build-site.yml 里有「把更新说明发到 npm」这一步，那是给它自己的包用的；
+// 我们既没有更新说明数据、也不该往别人的包里发东西，所以每次同步后整段删掉。
+// 不要用 hashFiles(...) 之类做条件：CI 的 probe-updates.mjs 会**生成** data/updates.json，
+// 判断条件时文件已存在（踩过：守卫放行 → 仍去发上游的包 → 404）。
+for (const item of CONFIG.stripWorkflowSteps || []) {
+  const file = path.join(ROOT, item.file)
+  if (!fs.existsSync(file)) {
+    problems.push(`剥步骤：缺少文件 ${item.file}`)
+    continue
+  }
+  const lines = fs.readFileSync(file, 'utf8').split('\n')
+  const i = lines.findIndex((l) => l.trim() === `- name: ${item.step}`)
+  if (i < 0) continue                                        // 已经不在了
+  let k = i
+  while (k > 0 && lines[k - 1].trim().startsWith('#')) k--    // 连上方紧邻的注释一起删
+  let j = i + 1
+  while (j < lines.length && !/^\s{6}- /.test(lines[j])) j++  // 到下一个步骤或文件末尾
+  if (!CHECK) fs.writeFileSync(file, lines.slice(0, k).concat(lines.slice(j)).join('\n'))
+  report.push(`剥掉步骤：${item.file} → ${item.step}（${j - k} 行）`)
+}
+
 // ── 4) 收尾自检：作用域内不应再有上游身份串（neverSwap 之外）──
 for (const file of scopeFiles()) {
   const text = fs.readFileSync(file, 'utf8')

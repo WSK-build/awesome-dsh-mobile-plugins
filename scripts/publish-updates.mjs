@@ -131,4 +131,10 @@ console.log(`publishing ${PKG}@${version} — ${entries} entries, sha ${hash.sli
 // without publishing, so the whole path can be exercised by hand.
 const args = ['publish', '--access', 'public']
 if (process.env.DRY_RUN === '1') args.push('--dry-run')
-execFileSync('npm', args, { stdio: 'inherit', cwd: stage })
+if (process.platform === 'win32') {
+  // Windows 上 npm 是 npm.cmd，而 Node 18+ 不允许直接 spawn .cmd（EINVAL）→ 必须走 shell；
+  // 走 shell 时把整条命令作为单字符串传（不传 args 数组），避免 Node 的 DEP0190 弃用警告。
+  execFileSync(`npm ${args.join(' ')}`, { stdio: 'inherit', cwd: stage, shell: true })
+} else {
+  execFileSync('npm', args, { stdio: 'inherit', cwd: stage })
+}
