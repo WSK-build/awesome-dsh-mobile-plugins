@@ -150,7 +150,9 @@ jobs:
 
       - name: Open a PR if anything changed
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 显式用内置令牌：gh 的认证优先级是 GH_TOKEN > GITHUB_TOKEN > 已存凭据，
+          # 写清楚可以排除"另有残留凭据被优先采用"这类分裂表现（checkout 用 github.token 推送）。
+          GH_TOKEN: ${{ github.token }}
           SKIPPED: ${{ steps.workflows.outputs.skipped }}
         run: |
           empty=''
@@ -196,6 +198,24 @@ jobs:
             git commit -m "chore: 同步上游代码/站点/脚本（身份与分类补丁已重新应用）"
           fi
           git push -u origin "$branch"
-          gh pr create --base main --head "$branch" \
-            --title "chore: 同步上游代码/站点/脚本" \
-            --body "$body"
+          # 用 REST 建 PR（而不是 gh pr create 的 GraphQL mutation）：
+          # GraphQL 对 App 令牌只回 "Resource not accessible by integration"，
+          # 不告诉你缺什么；REST 会给出状态码与 X-Accepted-GitHub-Permissions 响应头，
+          # 能直接区分「端点要什么权限」与「令牌实际有什么」。
+          set +e
+          out=$(gh api -i --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f title="chore: 同步上游代码/站点/脚本" \
+            -f head="$branch" \
+            -f base=main \
+            -f body="$body" 2>&1)
+          rc=$?
+          set -e
+          printf '%s\n' "$out"
+          if [ $rc -ne 0 ]; then
+            echo "::error::REST 建 PR 失败（rc=$rc）；响应头里的 X-Accepted-GitHub-Permissions 说明了该端点接受的权限"
+            exit $rc
+          fi
+          printf '%s\n' "$out" | grep -o '"html_url": *"[^"]*"' | head -1
