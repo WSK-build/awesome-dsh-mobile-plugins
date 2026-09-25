@@ -1,32 +1,6 @@
-# awesome-dsh-mobile-plugins
-
-![plugin count](https://img.shields.io/endpoint?url=https%3A%2F%2Fwsk-build.github.io%2Fawesome-dsh-mobile-plugins%2Fcount.json)
+# Awesome DSH Mobile Plugins [![Awesome](https://awesome.re/badge.svg)](https://awesome.re) ![plugin count](https://img.shields.io/endpoint?url=https%3A%2F%2Fwsk-build.github.io%2Fawesome-dsh-mobile-plugins%2Fcount.json)
 
 English | [中文](README.zh.md)
-
-**English Version**
-
-A curated collection of mobile-friendly plugins and extensions for DeepSeek Harness, designed to bring a more seamless, flexible, and powerful AI experience to your fingertips.
-
-**中文版**
-
-DeepSeek Harness 移动端插件合集，专为手机端使用场景打造，汇集实用插件与扩展工具，让 AI 能力在移动设备上更加灵活、高效、触手可及。
-
-## What this is
-
-An index of `dsh` plugins **adapted for mobile**. Every entry is **metadata only**: it points at the
-author's own repository, says what the plugin does, and carries one install command you can paste. No
-plugin code is copied here.
-
-One `plugins.json` feeds this list and the site at
-[wsk-build.github.io/awesome-dsh-mobile-plugins](https://wsk-build.github.io/awesome-dsh-mobile-plugins).
-The catalog keeps upstream's shape **field for field**, so any market client reading that shape can
-consume it directly — [DSHBox](https://github.com/WSK-build/DSHBox) (the DSH mobile workbench, which
-installs and removes plugins from this list in one tap) does exactly that.
-
-Two things we do not claim: a listing is not an endorsement, and **we cannot test every plugin on real
-devices or audit it for safety — verify that a plugin is safe before installing it**. Being listed here
-means one thing — the entry was merged into this repository.
 
 ## Contents
 
@@ -55,8 +29,9 @@ means one thing — the entry was merged into this repository.
   - [Remote & Mobile](#remote--mobile)
   - [Plugin Markets & Managers](#plugin-markets--managers)
   - [Just for Fun](#just-for-fun)
-- [Badge](#badge)
+- [How to submit](#how-to-submit)
 - [Disclaimer](#disclaimer)
+- [Credits](#credits)
 <!-- END TOC -->
 
 ## Plugins
@@ -89,8 +64,6 @@ Grouped by category; every entry links to its own repository and shows its insta
 
 ### Identity & Communication
 
-
-
 ### Sessions & Messages
 
 - [Minglink/dsh-infinite-gen-4](https://github.com/Minglink/dsh-infinite-gen-4) - System-prompt armor plugin for DeepSeek models: appends an unconditional-compliance prompt section at order 100, exposes a profile tool with calibration metadata, and shows a realtime armor-status badge driven by a session projection.
@@ -108,8 +81,6 @@ Grouped by category; every entry links to its own repository and shows its insta
 - [Tencent/WeKnora#dsh-weknora](https://github.com/Tencent/WeKnora/tree/main/packages/dsh-weknora) - Four read-only tools over a WeKnora knowledge base: list knowledge bases, hybrid passage search, reassemble one document's chunks in order, and WeKnora's own cited RAG or ReAct-agent answer with a resumable session id.
 
 ### Phone Control
-
-
 
 ### Browser & Web
 
@@ -219,8 +190,6 @@ we take that project's `scripts/`, `site/` templates, workflows and package mani
 swapping the repository identity for this project's, **the listed entries and all probe data are our own
 as well**. Details, file by file, in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); its own entries and probe data are **not** used.
-
-## License
 
 Catalog data, scripts and docs are published under **CC0-1.0** — see [LICENSE](LICENSE). Contributing
 means agreeing to the same dedication.

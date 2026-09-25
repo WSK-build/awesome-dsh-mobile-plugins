@@ -72,8 +72,8 @@ jobs:
             --title "chore: 同步上游代码/站点/脚本" \
             --body "自动同步 [awesome-dsh-plugin](https://github.com/WSK-build/awesome-dsh-mobile-plugins) 的代码/站点/脚本。
 
-- 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
-- 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）
-- 已通过：上游单测、README 重新生成、站点构建
+          - 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
+          - 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）
+          - 已通过：上游单测、README 重新生成、站点构建
 
-请人工过一眼上游这次改了什么再合。"
+          请人工过一眼上游这次改了什么再合。"

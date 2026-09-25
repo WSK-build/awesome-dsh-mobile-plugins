@@ -42,8 +42,8 @@ function headingFor(loc, id) {
 // HTML comment in the middle of the list splits it into two and trips
 // remark-lint:awesome-toc. `## Contributing` is deliberately not listed.
 const TOC_SHELL = {
-  en: { top: 'Plugins', tail: ['Badge', 'Disclaimer'] },
-  zh: { top: '插件', tail: ['徽章', '免责声明'] },
+  en: { top: 'Plugins', tail: ['How to submit', 'Disclaimer', 'Credits'] },
+  zh: { top: '插件', tail: ['怎么提交', '免责声明', '出处'] },
 }
 
 // Git may check text files out with CRLF on Windows. The generated blocks use
@@ -149,7 +149,9 @@ for (const loc of LOCALES) {
           if (e.description[loc.code] === undefined) untranslated.push(`${loc.readme}: ${e.url}`)
           return `- [${e.name}](${e.url}) ${loc.sep} ${escapeRefs(d)}`
         })
-      return `### ${headingFor(loc, id)}\n\n${lines.join('\n')}`
+      const heading = `### ${headingFor(loc, id)}`
+      // 空分类只输出标题：否则会连着留下多个空行，awesome-lint 的 no-multiple-blanks 会报错
+      return lines.length ? `${heading}\n\n${lines.join('\n')}` : heading
     })
     .join('\n\n')
 
