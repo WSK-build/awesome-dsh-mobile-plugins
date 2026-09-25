@@ -20,7 +20,8 @@
     "site/locales.mjs",
     "site/assets",
     "contributing.md",
-    "scripts/generate-readme.mjs"
+    "scripts/generate-readme.mjs",
+    "scripts/build-site.mjs"
   ],
   "neverSwap": [
     ".github/workflows/upstream-sync.yml"
