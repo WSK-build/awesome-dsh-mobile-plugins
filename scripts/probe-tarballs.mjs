@@ -56,7 +56,7 @@ if (!entries.length) {
 async function probe(url) {
   try {
     const r = await fetch(url, {
-      headers: { range: 'bytes=0-0', 'user-agent': 'awesome-dsh-plugin-tarball-probe' },
+      headers: { range: 'bytes=0-0', 'user-agent': 'awesome-dsh-mobile-plugins-tarball-probe' },
       redirect: 'follow',
       signal: AbortSignal.timeout(30000),
     })

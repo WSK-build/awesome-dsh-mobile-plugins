@@ -43,7 +43,7 @@ if (!TOKEN) {
   console.log('no GITHUB_TOKEN — skipping decay scan')
   process.exit(0)
 }
-const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-plugin-decay-scan' }
+const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-mobile-plugins-decay-scan' }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -158,7 +158,7 @@ async function manifest(repo, branch, path) {
     let r
     try {
       r = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/${path}`, {
-        headers: { 'user-agent': 'awesome-dsh-plugin-decay-scan' },
+        headers: { 'user-agent': 'awesome-dsh-mobile-plugins-decay-scan' },
         signal: AbortSignal.timeout(20000),
       })
     } catch {

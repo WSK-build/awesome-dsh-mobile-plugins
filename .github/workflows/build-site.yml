@@ -276,7 +276,9 @@ jobs:
       # catalog tarball would multiply every consumer's daily download for
       # data most never request. See scripts/publish-updates.mjs.
       - name: publish the update notes to npm
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        # 本项目没有更新说明数据（data/updates.json 不存在）：没有就不跑，
+        # 免得往一个空包（甚至别人同名的包）里发东西
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && hashFiles('data/updates.json') != ''
         run: |
           npm install -g npm@latest  # trusted publishing needs npm >= 11.5
           node scripts/publish-updates.mjs

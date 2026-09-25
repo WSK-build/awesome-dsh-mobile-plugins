@@ -16,7 +16,7 @@
  * build that ships bad data can be rolled back rather than only fixed
  * forwards.
  *
- * Why its OWN package rather than adding a file to `awesome-dsh-plugin`:
+ * Why its OWN package rather than adding a file to `awesome-dsh-mobile-plugins`:
  * npm force-includes README files regardless of the `files` field, and this
  * repo's two READMEs are generated and large (514KB + 491KB). Attaching the
  * catalog to that package would have made every consumer download ~1MB of

@@ -73,7 +73,7 @@ console.log(`${urls.length} listed, ${pendingFull.length} full probe(s), ${pendi
 
 async function fetchJson(url) {
   const res = await fetch(url, {
-    headers: { accept: 'application/json', 'user-agent': 'awesome-dsh-plugin-npm-probe' },
+    headers: { accept: 'application/json', 'user-agent': 'awesome-dsh-mobile-plugins-npm-probe' },
     signal: AbortSignal.timeout(10000),
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)

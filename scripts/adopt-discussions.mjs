@@ -43,7 +43,7 @@ if (!TOKEN) {
   console.log('no GITHUB_TOKEN — skipping discussion adoption')
   process.exit(0)
 }
-const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-plugin-adopt-discussions' }
+const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-mobile-plugins-adopt-discussions' }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 

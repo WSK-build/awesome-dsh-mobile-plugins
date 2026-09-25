@@ -89,7 +89,7 @@ async function listings(wants) {
           accept: 'application/vnd.github+json',
           authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
           'content-type': 'application/json',
-          'user-agent': 'awesome-dsh-plugin-readme-probe',
+          'user-agent': 'awesome-dsh-mobile-plugins-readme-probe',
         },
         body: JSON.stringify({ query }),
         signal: AbortSignal.timeout(30000),
@@ -167,7 +167,7 @@ async function raw(repo, path) {
     let res
     try {
       res = await fetch(`https://raw.githubusercontent.com/${repo}/HEAD/${path}`, {
-        headers: { 'user-agent': 'awesome-dsh-plugin-readme-probe' },
+        headers: { 'user-agent': 'awesome-dsh-mobile-plugins-readme-probe' },
         signal: AbortSignal.timeout(20000),
       })
     } catch {

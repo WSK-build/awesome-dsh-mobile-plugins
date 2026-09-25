@@ -24,7 +24,7 @@ test('recognises a plugin term and nothing else', () => {
   // real titles from this repository's discussions
   assert.equal(isPluginTerm('为什么左侧的工作区无法显示壁纸，还是原本的边框？'), false)
   assert.equal(isPluginTerm('one bug'), false)
-  assert.equal(isPluginTerm('plugin:awesome-dsh-plugin'), false)
+  assert.equal(isPluginTerm('plugin:awesome-dsh-mobile-plugins'), false)
   assert.equal(isPluginTerm('plugin:owner/repo '), false)
 })
 

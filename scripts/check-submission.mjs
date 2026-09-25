@@ -94,7 +94,7 @@ if (!TOKEN) {
   console.error('GITHUB_TOKEN is required (tree enumeration exceeds the anonymous quota)')
   process.exit(1)
 }
-const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-plugin-ci' }
+const HEADERS = { accept: 'application/vnd.github+json', authorization: `Bearer ${TOKEN}`, 'user-agent': 'awesome-dsh-mobile-plugins-ci' }
 
 const gateApplies = !PR_CREATED || new Date(PR_CREATED) >= new Date(GATE_EFFECTIVE_FROM)
 

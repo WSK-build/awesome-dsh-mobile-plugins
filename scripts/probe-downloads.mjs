@@ -92,7 +92,7 @@ async function fetchJson(url, { attempts = 6 } = {}) {
   let wait = 1000
   for (let attempt = 1; ; attempt++) {
     const res = await fetch(url, {
-      headers: { accept: 'application/json', 'user-agent': 'awesome-dsh-plugin-downloads-probe' },
+      headers: { accept: 'application/json', 'user-agent': 'awesome-dsh-mobile-plugins-downloads-probe' },
       signal: AbortSignal.timeout(10000),
     })
     if (res.ok || res.status === 404) return res.json()
