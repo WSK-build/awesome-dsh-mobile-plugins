@@ -42,8 +42,8 @@ function headingFor(loc, id) {
 // HTML comment in the middle of the list splits it into two and trips
 // remark-lint:awesome-toc. `## Contributing` is deliberately not listed.
 const TOC_SHELL = {
-  en: { top: 'Plugins', tail: [] },
-  zh: { top: '插件', tail: [] },
+  en: { top: 'Plugins', tail: ['How to submit', 'Disclaimer', 'Credits'] },
+  zh: { top: '插件', tail: ['怎么提交', '免责声明', '出处'] },
 }
 
 // Git may check text files out with CRLF on Windows. The generated blocks use
