@@ -42,6 +42,30 @@ function rel(file) {
   return path.relative(ROOT, file).replaceAll('\\', '/')
 }
 
+// 行尾无关的文本匹配。配置里的补丁文本一律是 LF，但 Windows 检出（core.autocrlf）
+// 会把仓库文件写成 CRLF —— 直接 includes 会匹配不上，于是本地报假 drift，CI（Linux）却是绿的。
+// 做法：把补丁文本编译成「换行处容忍 \r\n」的正则；命中后按**命中片段自身的行尾**写回，
+// 这样既不改写文件其它位置的行尾，混合行尾的文件也不会被整体规范化。
+function eolPattern(s) {
+  const escaped = s.replace(/\r\n/g, '\n').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(escaped.replace(/\n/g, '\\r?\\n'))
+}
+
+/** 判定文件使用的行尾：全 CRLF 或全 LF 直接返回；混杂时取多数（插入的文本跟随多数派）。 */
+function detectEol(text) {
+  const crlf = (text.match(/\r\n/g) || []).length
+  const lf = (text.match(/(?<!\r)\n/g) || []).length
+  if (crlf === 0) return '\n'
+  if (lf === 0) return '\r\n'
+  return crlf >= lf ? '\r\n' : '\n'
+}
+
+/** 把文本的换行统一换成给定的行尾风格：先归一成 LF 再转换，避免 \r\n 被二次处理成 \r\r\n。 */
+function asEol(text, eol) {
+  const lf = text.replace(/\r\n/g, '\n')
+  return eol === '\r\n' ? lf.replace(/\n/g, '\r\n') : lf
+}
+
 /** 作用域内的文件清单：syncPaths 下的文本文件，去掉 neverSwap。 */
 function scopeFiles() {
   const out = []
@@ -122,12 +146,18 @@ for (const item of CONFIG.replacements || []) {
     continue
   }
   const text = fs.readFileSync(file, 'utf8')
-  if (text.includes(item.to)) continue // 已打好
-  if (!text.includes(item.from)) {
+  // 匹配与写回都走 eolPattern，CRLF 检出下也能命中（见该函数上方说明）
+  const fromRe = eolPattern(item.from)
+  if (eolPattern(item.to).test(text)) continue // 已打好
+  const hit = fromRe.exec(text)
+  if (!hit) {
     problems.push(`文本补丁 drift：${item.file} 里既没有目标文本也没有源文本（源文本：${JSON.stringify(item.from)}）`)
     continue
   }
-  if (!CHECK) fs.writeFileSync(file, text.replaceAll(item.from, item.to))
+  if (!CHECK) {
+    const globalRe = new RegExp(fromRe.source, 'g')
+    fs.writeFileSync(file, text.replace(globalRe, () => asEol(item.to, detectEol(text))))
+  }
   report.push(`文本补丁：${item.file}（源文本首行：${JSON.stringify(item.from.split('\n')[0])}）`)
 }
 
@@ -151,7 +181,9 @@ for (const item of CONFIG.stripWorkflowSteps || []) {
     problems.push(`剥步骤：缺少文件 ${item.file}`)
     continue
   }
-  const lines = fs.readFileSync(file, 'utf8').split('\n')
+  // 拆成「行内容」与「行尾」两份，删除后按原样拼回：文件的行尾风格（LF / CRLF / 混合）不被改写。
+  const parts = fs.readFileSync(file, 'utf8').split(/(\r?\n)/)
+  const lines = parts.filter((_, idx) => idx % 2 === 0)
   const i = lines.findIndex((l) => l.trim() === `- name: ${item.step}`)
   if (i < 0) {
     // --check 跑在补丁已应用的树上：步骤不存在就是预期终态（我们提交的版本本来已剥掉），记 report；
@@ -171,7 +203,13 @@ for (const item of CONFIG.stripWorkflowSteps || []) {
     if (m && m[1].length <= indent) break
     j++
   }
-  if (!CHECK) fs.writeFileSync(file, lines.slice(0, k).concat(lines.slice(j)).join('\n'))
+  // 丢掉 [k, j) 这些行（连同它们各自后面的分隔符），其余原样保留
+  const kept = []
+  for (let idx = 0; idx < parts.length; idx += 2) {
+    if (idx / 2 >= k && idx / 2 < j) continue
+    kept.push(parts[idx], parts[idx + 1] ?? '')
+  }
+  if (!CHECK) fs.writeFileSync(file, kept.join(''))
   report.push(`剥掉步骤：${item.file} → ${item.step}（${j - k} 行）`)
 }
 
