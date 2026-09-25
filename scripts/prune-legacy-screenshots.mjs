@@ -79,7 +79,7 @@ async function adopted(url) {
   const { repo, sub } = decompose(url)
   const at = `https://raw.githubusercontent.com/${repo}/HEAD/${sub ? sub + '/' : ''}screenshots.json`
   try {
-    const r = await fetch(at, { headers: { 'user-agent': 'awesome-dsh-plugin-screenshot-prune' }, signal: AbortSignal.timeout(15000) })
+    const r = await fetch(at, { headers: { 'user-agent': 'awesome-dsh-mobile-plugins-screenshot-prune' }, signal: AbortSignal.timeout(15000) })
     if (!r.ok) return false
     return usable(await r.text(), url)
   } catch {

@@ -31,7 +31,9 @@
     ["awesome-dsh-plugin.com", "wsk-build.github.io/awesome-dsh-mobile-plugins"],
     ["'awesome-dsh-plugin'", "'awesome-dsh-mobile-plugins'"],
     ["\"awesome-dsh-plugin\"", "\"awesome-dsh-mobile-plugins\""],
-    ["dsh-plugin-catalog", "dsh-mobile-plugin-catalog"]
+    ["dsh-plugin-catalog", "dsh-mobile-plugin-catalog"],
+    ["dsh-plugin-updates", "dsh-mobile-plugin-updates"],
+    ["awesome-dsh-plugin", "awesome-dsh-mobile-plugins"]
   ],
   "categoryRename": {
     "fromId": "wsl",

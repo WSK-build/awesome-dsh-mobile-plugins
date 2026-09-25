@@ -66,7 +66,7 @@ function decompose(url) {
 
 async function fetchText(url) {
   const r = await fetch(url, {
-    headers: { 'user-agent': 'awesome-dsh-plugin-screenshot-probe' },
+    headers: { 'user-agent': 'awesome-dsh-mobile-plugins-screenshot-probe' },
     signal: AbortSignal.timeout(15000),
   })
   if (!r.ok) return null
@@ -149,7 +149,7 @@ async function declared(entry) {
 async function probe(url) {
   try {
     const r = await fetch(url, {
-      headers: { range: 'bytes=0-0', 'user-agent': 'awesome-dsh-plugin-screenshot-probe' },
+      headers: { range: 'bytes=0-0', 'user-agent': 'awesome-dsh-mobile-plugins-screenshot-probe' },
       redirect: 'follow',
       signal: AbortSignal.timeout(30000),
     })

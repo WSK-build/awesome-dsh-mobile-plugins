@@ -71,7 +71,7 @@ async function probe(url) {
       headers: {
         accept: 'application/vnd.github+json',
         authorization: `Bearer ${token}`,
-        'user-agent': 'awesome-dsh-plugin-stars-probe',
+        'user-agent': 'awesome-dsh-mobile-plugins-stars-probe',
       },
       signal: AbortSignal.timeout(10000),
     })

@@ -92,7 +92,7 @@ async function gh(path) {
     headers: {
       accept: 'application/vnd.github+json',
       authorization: `Bearer ${token}`,
-      'user-agent': 'awesome-dsh-plugin-updates-probe',
+      'user-agent': 'awesome-dsh-mobile-plugin-updates-probe',
     },
     signal: AbortSignal.timeout(15000),
   })
@@ -124,7 +124,7 @@ async function graphql(query) {
       accept: 'application/vnd.github+json',
       authorization: `Bearer ${token}`,
       'content-type': 'application/json',
-      'user-agent': 'awesome-dsh-plugin-updates-probe',
+      'user-agent': 'awesome-dsh-mobile-plugin-updates-probe',
     },
     body: JSON.stringify({ query }),
     signal: AbortSignal.timeout(30000),

@@ -1,5 +1,5 @@
 /**
- * Publish `updates.json` to npm as the `dsh-plugin-updates` package.
+ * Publish `updates.json` to npm as the `dsh-mobile-plugin-updates` package.
  *
  * The companion to publish-catalog.mjs for the update-notes data
  * (probe-updates.mjs → data/updates.json → docs/updates.json): per-repo
@@ -25,7 +25,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-const PKG = 'dsh-plugin-updates'
+const PKG = 'dsh-mobile-plugin-updates'
 const BUILT = 'docs/updates.json'
 const REGISTRY = 'https://registry.npmjs.org'
 
@@ -67,7 +67,7 @@ export function updatesVersion(now, run) {
 
 /** The README the package page shows. Short, because it is shipped to readers. */
 function readme(version, entries) {
-  return `# dsh-plugin-updates
+  return `# dsh-mobile-plugin-updates
 
 Per-plugin update notes for the DeepSeek Harness plugin catalog — the latest
 release's notes and a short tail of recent commits for every listed plugin,
@@ -78,7 +78,7 @@ version and HEAD without any end user touching the GitHub API, whose anonymous
 budget is shared per egress IP and unusable behind common proxies.
 
 \`\`\`js
-import updates from 'dsh-plugin-updates/updates.json' with { type: 'json' }
+import updates from 'dsh-mobile-plugin-updates/updates.json' with { type: 'json' }
 \`\`\`
 
 - **Entries:** ${entries}
