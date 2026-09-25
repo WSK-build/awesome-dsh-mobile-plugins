@@ -102,6 +102,18 @@ jobs:
             echo "::error::Entry files must be added as data/plugins/<owner>__<repo>.yml — exactly one level deep. readEntries() globs data/plugins/*.yml and is not recursive, so a file at any other path is never read: the READMEs regenerate without it, every other check passes, and merging the PR lists nothing. Move it with: git mv <file> data/plugins/<owner>__<repo>.yml"
             exit 1
           fi
+      - name: Description bleed scan (advisory)
+        # scripts/check-bleed.mjs 检测两个条目共享超过 40 字符的描述片段，用于
+        # 发现"把 A 插件的描述复制到了 B 条目"。--base 的语义是只扫描相对该 sha
+        # 变更的条目（git diff --name-only --diff-filter=d <sha>...HEAD --
+        # data/plugins）；该 diff 失败时脚本回退为全量扫描并继续。
+        #
+        # 只报告、不拦截是上游的既定设计：相似插件的描述本来就会相近，同作者的
+        # 多子包会被跳过。脚本无发现时 process.exit(0)，有发现时打印报告后自然
+        # 结束，退出码同为 0，因此本步骤按原样运行即可，不会让 PR 检查变红。
+        run: |
+          git fetch -q origin ${{ github.event.pull_request.base.sha }}
+          node scripts/check-bleed.mjs --base ${{ github.event.pull_request.base.sha }}
       - name: A generated README row that lists nothing is not a submission
         # The yml is the submission; README.md and README.zh.md are generated
         # from data/plugins on main after the merge. So a pull request that
