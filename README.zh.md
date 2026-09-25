@@ -9,6 +9,12 @@
 专为移动端适配**的 `dsh` 插件索引。每条条目**只存元数据**：指向作者自己的仓库、说明它做什么、
 附一行可直接粘贴的安装命令。插件代码一律留在作者仓库里，这里不复制任何代码。
 
+一份 `plugins.json` 同时供本列表与站点
+[wsk-build.github.io/awesome-dsh-mobile-plugins](https://wsk-build.github.io/awesome-dsh-mobile-plugins) 读取；
+目录结构与上游精选列表**逐字段一致**，因此任何按该结构读取的市场客户端都能直接读它——[DSHBox](https://github.com/WSK-build/DSHBox)（DSH 移动端工作台，可一键安装/卸载本仓库收录插件）就是这么做的。
+
+有两点我们不作承诺：**收录不等于背书**；我们**无法做所有真机实测与安全性检测，安装时请核实插件安全性**。出现在这里只说明一件事——该条目已合并进本仓库。
+
 ## 目录
 
 <!-- BEGIN TOC -->
