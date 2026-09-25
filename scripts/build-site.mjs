@@ -20,6 +20,10 @@ import { firstAddedDate } from './lib/added-dates.mjs'
 import { slugOf, termOf } from './lib/terms.mjs'
 
 const ORIGIN = 'https://wsk-build.github.io/awesome-dsh-mobile-plugins'
+
+// 本项目部署在 GitHub Pages 的**项目站**下（/<repo>/），因此站点内的绝对链接都要带这段前缀；
+// 但生成文件的**输出目录**不能带（docs/ 就是站点根）。这里从 ORIGIN 推出前缀，避免两处硬编码。
+const SITE_BASE = new URL(ORIGIN).pathname.replace(/\/$/, '')
 const DATES_FILE = 'data/added-dates.json'
 const SCREENSHOTS_FILE = 'data/screenshots.json'
 
@@ -701,7 +705,7 @@ for (const loc of LOCALES) {
       .map((l) => `<a class="lang-btn" href="${l.privacyPath}" hreflang="${l.code}" rel="alternate">${l.label}</a>`).join('\n  '))
     .replaceAll('__PRIVACY_BODY__', () => fs.readFileSync(loc.privacyBody, 'utf8').trimEnd())
   for (const [k, v] of Object.entries(loc.strings)) page = page.replaceAll(`__T_${k}__`, () => v)
-  const outDir = 'docs' + loc.privacyPath.replace(/\/$/, '')
+  const outDir = 'docs' + loc.privacyPath.replace(SITE_BASE, '').replace(/\/$/, '')
   fs.mkdirSync(outDir, { recursive: true })
   fs.writeFileSync(`${outDir}/index.html`, page)
 }

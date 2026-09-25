@@ -10,6 +10,16 @@ An index of `dsh` plugins **adapted for mobile**. Every entry is **metadata only
 author's own repository, says what the plugin does, and carries one install command you can paste. No
 plugin code is copied here.
 
+One `plugins.json` feeds this list and the site at
+[wsk-build.github.io/awesome-dsh-mobile-plugins](https://wsk-build.github.io/awesome-dsh-mobile-plugins).
+The catalog keeps upstream's shape **field for field**, so any market client reading that shape can
+consume it directly — [DSHBox](https://github.com/WSK-build/DSHBox) (the DSH mobile workbench, which
+installs and removes plugins from this list in one tap) does exactly that.
+
+Two things we do not claim: a listing is not an endorsement, and **we cannot test every plugin on real
+devices or audit it for safety — verify that a plugin is safe before installing it**. Being listed here
+means one thing — the entry was merged into this repository.
+
 ## Contents
 
 <!-- BEGIN TOC -->
