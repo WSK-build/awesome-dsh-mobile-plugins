@@ -2,6 +2,14 @@
 
 English | [中文](README.zh.md)
 
+> English — A curated collection of mobile-friendly plugins and extensions for DeepSeek Harness, designed to bring a more seamless, flexible, and powerful AI experience to your fingertips.
+>
+> 中文 — DeepSeek Harness 移动端插件合集，专为手机端使用场景打造，汇集实用插件与扩展工具，让 AI 能力在移动设备上更加灵活、高效、触手可及。
+
+An index of `dsh` plugins **adapted for mobile**. Every entry is **metadata only**: it points at the
+author's own repository, says what the plugin does, and carries one install command you can paste. No
+plugin code is copied here.
+
 ## Contents
 
 <!-- BEGIN TOC -->

@@ -2,6 +2,13 @@
 
 [English](README.md) | 中文
 
+> English — DeepSeek Harness 移动端插件合集，专为手机端使用场景打造，汇集实用插件与扩展工具，让 AI 能力在移动设备上更加灵活、高效、触手可及。
+>
+> 中文 — A curated collection of mobile-friendly plugins and extensions for DeepSeek Harness, designed to bring a more seamless, flexible, and powerful AI experience to your fingertips.
+
+专为移动端适配**的 `dsh` 插件索引。每条条目**只存元数据**：指向作者自己的仓库、说明它做什么、
+附一行可直接粘贴的安装命令。插件代码一律留在作者仓库里，这里不复制任何代码。
+
 ## 目录
 
 <!-- BEGIN TOC -->
@@ -176,9 +183,9 @@ CI 会校验字段、文件名与仓库绑定；合并后本 README 与站点会
 
 本仓库的 issue 只处理**清单与站点本身**。`dsh` 本体的问题请提到
 [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness/issues)；某个插件的 bug 请到该插件自己的仓库提；
-**你在客户端里看到的市场界面问题，请提到那个客户端自己的仓库**（例如 DSHBox 的提到
+你在客户端里看到的市场界面问题，请提到那个客户端自己的仓库（例如 DSHBox 的提到
 [WSK-build/DSHBox](https://github.com/WSK-build/DSHBox/issues)）——本仓库不发布、也不维护任何客户端。
-**不希望被收录的作者说一声，我们立刻撤下条目。**
+不希望被收录的作者说一声，我们立刻撤下条目。
 
 ## 出处
 
