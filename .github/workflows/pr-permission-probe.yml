@@ -4,6 +4,8 @@ name: Probe PR creation permission
 # 不参与任何业务，用完后删除。
 on:
   workflow_dispatch:
+  push:
+    branches: [diag/actions-token-pr]
 
 permissions:
   contents: write
