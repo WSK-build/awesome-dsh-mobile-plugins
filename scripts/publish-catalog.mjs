@@ -103,6 +103,10 @@ source repository. Published automatically; do not open pull requests here.
 `
 }
 
+if (!fs.existsSync(BUILT)) {
+  console.error(`缺少 ${BUILT}，无法发布。请先运行 \`node scripts/build-site.mjs\` 生成该文件。`)
+  process.exit(1)
+}
 const built = fs.readFileSync(BUILT)
 const hash = sha256(built)
 if (hash === await publishedHash()) {

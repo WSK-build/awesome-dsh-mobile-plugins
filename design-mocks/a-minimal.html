@@ -4,12 +4,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A — Minimal Light · Awesome DSH Plugin</title>
+<title>A — Minimal Light · awesome-dsh-mobile-plugins</title>
 <style>
 :root{
   --bg:#fcfcfc; --surface:#ffffff; --border:#e6e4e1; --border-strong:#d5d2ce;
   --text:#17150f; --text-2:#5c574f; --text-3:#8a847a;
-  --accent:#c0392b; --accent-hover:#a53125; --accent-soft:#fdf1ef;
+  --accent:#0E7C60; --accent-hover:#0A5A46; --accent-soft:#DFEBE4;
   --sans:"Inter","SF Pro Text","PingFang SC","Noto Sans SC",system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,monospace;
 }
@@ -23,7 +23,7 @@ button{font-family:inherit;cursor:pointer}
 nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .nav-in{display:flex;align-items:center;gap:1.6rem;height:3.5rem}
 .logo{display:flex;align-items:center;gap:.55rem;font-weight:650;font-size:.95rem;letter-spacing:-.01em}
-.logo svg{flex:none}
+.logo img{flex:none;width:20px;height:20px}
 .nav-links{display:flex;gap:1.3rem;margin-left:auto;font-size:.86rem;color:var(--text-2)}
 .nav-links a:hover{color:var(--text)}
 .nav .lang{font-size:.82rem;color:var(--text-3);border:1px solid var(--border);border-radius:6px;padding:.25rem .6rem}
@@ -83,7 +83,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.8rem
 
 <nav><div class="wrap nav-in">
   <span class="logo">
-    <svg width="20" height="20" viewBox="76 42 400 400"><g fill="#17150f"><rect x="112" y="112" width="88" height="88" rx="14"/><rect x="212" y="112" width="88" height="88" rx="14"/><rect x="112" y="212" width="88" height="88" rx="14"/><rect x="212" y="212" width="88" height="88" rx="14"/><rect x="112" y="312" width="88" height="88" rx="14"/><rect x="212" y="312" width="88" height="88" rx="14"/><rect x="312" y="212" width="88" height="88" rx="14"/><rect x="312" y="312" width="88" height="88" rx="14"/></g><rect x="346" y="78" width="88" height="88" rx="14" fill="#c0392b" transform="rotate(9 390 122)"/></svg>
+    <img src="../site/assets/logo.svg" alt="" width="20" height="20" style="border-radius:6px;display:block">
     awesome-dsh-mobile-plugins
   </span>
   <div class="nav-links">

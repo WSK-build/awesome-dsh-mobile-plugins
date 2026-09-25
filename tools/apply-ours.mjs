@@ -112,6 +112,25 @@ for (const [target, from, to] of categoryEdits) {
   report.push(`分类补丁：${target}  ${from} → ${to}`)
 }
 
+// ── 2b) 声明式文本补丁：保住我们对上游文件的少量改动（清单见 ours.config.json）──
+// 为什么需要：这些文件不在 oursOwned 里，每次取件都会被上游版本覆盖，少量自改会丢。
+// 语义与分类补丁一致：已含 to 就跳过；既无 to 也无 from 记 drift；否则把 from 替换为 to。
+for (const item of CONFIG.replacements || []) {
+  const file = path.join(ROOT, item.file)
+  if (!fs.existsSync(file)) {
+    problems.push(`文本补丁：缺少文件 ${item.file}`)
+    continue
+  }
+  const text = fs.readFileSync(file, 'utf8')
+  if (text.includes(item.to)) continue // 已打好
+  if (!text.includes(item.from)) {
+    problems.push(`文本补丁 drift：${item.file} 里既没有目标文本也没有源文本（源文本：${JSON.stringify(item.from)}）`)
+    continue
+  }
+  if (!CHECK) fs.writeFileSync(file, text.replaceAll(item.from, item.to))
+  report.push(`文本补丁：${item.file}（源文本首行：${JSON.stringify(item.from.split('\n')[0])}）`)
+}
+
 // ── 3) 删掉不该存在的文件（上游的自定义域名）──
 for (const target of CONFIG.removePaths) {
   const file = path.join(ROOT, target)
@@ -134,11 +153,24 @@ for (const item of CONFIG.stripWorkflowSteps || []) {
   }
   const lines = fs.readFileSync(file, 'utf8').split('\n')
   const i = lines.findIndex((l) => l.trim() === `- name: ${item.step}`)
-  if (i < 0) continue                                        // 已经不在了
+  if (i < 0) {
+    // --check 跑在补丁已应用的树上：步骤不存在就是预期终态（我们提交的版本本来已剥掉），记 report；
+    // apply 跑在刚取件的树上：步骤不存在说明上游改了步骤名/写法，少剥一步必须有信号（drift → exit 1）。
+    if (CHECK) report.push(`剥步骤：${item.file} → ${item.step} 已不存在（视为已剥）`)
+    else problems.push(`剥步骤 drift：${item.file} 里找不到步骤 ${JSON.stringify(item.step)}（上游可能改了步骤名）`)
+    continue
+  }
   let k = i
   while (k > 0 && lines[k - 1].trim().startsWith('#')) k--    // 连上方紧邻的注释一起删
+  const indent = lines[i].length - lines[i].trimStart().length
   let j = i + 1
-  while (j < lines.length && !/^\s{6}- /.test(lines[j])) j++  // 到下一个步骤或文件末尾
+  // 结束于「缩进不大于该 - name: 行的下一个 `- ` 行」（同级或更外层的下一个步骤）；
+  // 不按固定 6 空格判断，run: | 体内恰好 6 空格的 `- ` 行不会提前截断。
+  while (j < lines.length) {
+    const m = lines[j].match(/^(\s*)- /)
+    if (m && m[1].length <= indent) break
+    j++
+  }
   if (!CHECK) fs.writeFileSync(file, lines.slice(0, k).concat(lines.slice(j)).join('\n'))
   report.push(`剥掉步骤：${item.file} → ${item.step}（${j - k} 行）`)
 }

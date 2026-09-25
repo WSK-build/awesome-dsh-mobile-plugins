@@ -1,7 +1,7 @@
 {
   "_说明": "首次收录通知的文案与投递规则。只对『从未通知过』的条目作者发一次；后续条目更新一律不打扰。",
-  "issueTitle": "收录公告：我们收录了你的插件（只通知一次）",
-  "intro": "本仓库会把收录到的插件作者 @ 在这里，**每位作者只 @ 一次**；此后条目无论怎么更新都不会再打扰。\n\n收录只保存元数据、链回作者自己的仓库，不构成背书，也不代表我们做过真机测试。不希望被收录的作者，回一句或提一个删条目的 PR，我们会立刻撤下。\n\n---",
+  "_issueTitle": "收录公告：我们收录了你的插件（只通知一次）",
+  "_intro": "本仓库会把收录到的插件作者 @ 在这里，**每位作者只 @ 一次**；此后条目无论怎么更新都不会再打扰。\n\n收录只保存元数据、链回作者自己的仓库，不构成背书，也不代表我们做过真机测试。不希望被收录的作者，回一句或提一个删条目的 PR，我们会立刻撤下。\n\n---",
   "commentZh": "你好！我们在 awesome-dsh-mobile-plugins（{origin}）收录了 {entries}——一个面向手机端的 DSH 插件目录，只存元数据、链回你的仓库。收录不构成背书，我们也不声称做过真机测试。不想被收录的话，回一句或提个删条目的 PR，我们立刻撤下。",
   "commentEn": "Hi! We listed {entries} in awesome-dsh-mobile-plugins ({origin}) — a phone-oriented index that keeps metadata only and links back to your repo. Listing is not an endorsement, and we do not claim to have tested it. Prefer not to be listed? Reply here or open a PR removing the entry and we'll take it down.",
   "_entries格式": "一个仓库多条时合并成一句，例如 `a/b` + `a/b#子包` → `a/b（含 packages/x、packages/y 两个子包）`",

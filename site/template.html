@@ -23,12 +23,10 @@ __HREFLANGS__
 <link rel="icon" href="__T_BASE__logo.svg" type="image/svg+xml">
 <script type="application/ld+json">{}</script>
 <style>
-/* Archivo is self-hosted, not loaded from Google Fonts: a webfont request
-   hands the visitor's IP to a third party on every page view, for a display
-   face used in headings only. One variable file per subset covers the whole
-   500-900 range the design uses, so this is also fewer bytes and two fewer
-   connections. Files live in site/assets/ and the build copies them to docs/. */
-/* ── 纸墨朱砂 · warm paper + modern cards (design B, 2026-08) ── */
+/* 不加载 Google Fonts：网络字体会在每次页面访问时把访客 IP 交给第三方，
+   而标题只用到一种展示字体。标题与正文都使用 :root 上的系统字体栈
+   （--sans / --display），站点不携带字体文件，构建也不会向 docs/ 复制字体。 */
+/* ── 纸墨 + 印章绿 · warm paper + modern cards (design B, 2026-08) ── */
 :root{
   /* 纸墨（取自本项目 logo Paper & Ink）+ 印章绿（与 DSHBox 宿主 UI 主色一致） */
   --paper:#F0ECE2; --paper-2:#E8E3D6; --card:#FBF9F3; --line:#DCD5C6; --line-2:#C8BFAC;
@@ -65,27 +63,16 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-fa
 nav.top{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .nav-in{display:flex;align-items:center;gap:1.4rem;height:3.6rem}
 .logo{display:flex;align-items:center;gap:.55rem;font-family:var(--display);font-weight:700;font-size:.95rem;letter-spacing:-.01em}
-.logo svg{flex:none}
-.logo svg g{fill:var(--ink)}
-.logo svg .plug-block{fill:var(--seal)}
 .nav-links{display:flex;gap:1.2rem;margin-left:auto;font-size:.86rem;color:var(--ink-2);align-items:center;flex-wrap:wrap}
 .nav-links a{transition:color .15s ease}
 .nav-links a:hover{color:var(--seal)}
 .lang-btn{font-size:.82rem;color:var(--ink-3);border:1px solid var(--line);border-radius:8px;padding:.25rem .6rem;transition:all .15s ease}
 .lang-btn:hover{color:var(--ink);border-color:var(--line-2)}
 
-/* ── hero on grid paper ── */
-header.hero{
-  background-image:linear-gradient(var(--paper-2) 1px,transparent 1px),linear-gradient(90deg,var(--paper-2) 1px,transparent 1px);
-  background-size:28px 28px;border-bottom:1px solid var(--line);
-}
+/* ── hero ──：纯纸底，不铺任何背景纹理，只有下边框 ── */
+header.hero{border-bottom:1px solid var(--line)}
 .hero-in{padding-block:clamp(2.4rem,6vh,4.2rem) 0;display:flex;align-items:center;gap:clamp(1.4rem,4vw,3rem);flex-wrap:wrap}
 .mark{flex:none;width:clamp(72px,9vw,104px);height:auto}
-.mark g{fill:var(--ink)}
-.mark .plug-block{fill:var(--seal);transform-box:fill-box;transform-origin:center;transform:rotate(9deg);
-  animation:snap-in .9s cubic-bezier(.22,1,.36,1) .3s both}
-@keyframes snap-in{from{transform:translate(46px,-46px) rotate(0deg);opacity:0}60%{opacity:1}to{transform:translate(0,0) rotate(9deg)}}
-@media (prefers-reduced-motion:reduce){.mark .plug-block{animation:none}}
 h1{font-family:var(--display);font-size:clamp(1.7rem,3.9vw,2.7rem);font-weight:800;letter-spacing:-.03em;line-height:1.12;text-wrap:balance}
 h1 em{font-style:normal;color:var(--seal)}
 .tagline{margin-top:.6rem;color:var(--ink-2);max-width:40rem;text-wrap:pretty}
@@ -103,17 +90,6 @@ h1 em{font-style:normal;color:var(--seal)}
 .searchbar input{flex:1;border:none;outline:none;font:inherit;background:none;color:var(--ink);min-width:0;caret-color:var(--seal)}
 .searchbar input::placeholder{color:var(--ink-3)}
 .searchbar .count{font-family:var(--mono);font-size:.74rem;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
-
-.market{max-width:38rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;
-  background:var(--seal-soft);border:1px solid var(--seal-border);border-radius:12px;padding:.7rem 1rem;font-size:.88rem;color:var(--ink-2)}
-.market svg{color:var(--seal);flex:none}
-.market .lead b{color:var(--seal-deep)}
-.market .lead a:hover{text-decoration:underline;text-underline-offset:3px}
-/* min-width: same label swap as .cli .copy, same reason — see there. */
-.market .go{margin-left:auto;flex:none;font-weight:600;font-size:.82rem;color:var(--on-seal);background:var(--seal);
-  border:none;border-radius:8px;padding:.42rem .9rem;transition:background .15s ease;white-space:nowrap;
-  min-width:7rem;text-align:center}
-.market .go:hover{background:var(--seal-deep)}
 
 /* ── chips ── */
 .filters-band{padding-block:1.5rem 0}
@@ -185,7 +161,7 @@ li.hidden{display:none}
 /* min-width reserves room for the "✓ copied" label this swaps to on click and
    reverts from 1.2s later. That revert is past the 500ms window CLS forgives
    after an interaction, so without it the button resizes and squeezes the
-   input beside it as an unexpected shift. Same reason as .market .go below. */
+   input beside it as an unexpected shift. */
 .cli .copy{margin:0;border:none;border-left:1px solid var(--line-2);flex:none;display:flex;align-items:center;
   font-family:var(--mono);font-size:.68rem;color:var(--ink-3);background:var(--card);padding:0 .8rem;white-space:nowrap;
   min-width:5.5rem;justify-content:center;transition:all .15s ease}
@@ -210,7 +186,6 @@ footer{border-top:1px solid var(--line);padding-block:1.8rem 2.8rem;color:var(--
 footer .frow{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem 1.5rem}
 footer a{color:var(--ink-2)}
 footer a:hover{color:var(--seal)}
-footer .motto{font-family:var(--mono);color:var(--seal)}
 #toTop{position:fixed;right:clamp(.8rem,2vw,1.6rem);bottom:clamp(.8rem,2vw,1.6rem);z-index:30;
   width:2.75rem;height:2.75rem;display:grid;place-items:center;border-radius:10px;
   font-family:var(--mono);font-size:1rem;color:var(--ink-2);
@@ -221,7 +196,6 @@ footer .motto{font-family:var(--mono);color:var(--seal)}
 
 @media (max-width:640px){
   .nav-links{gap:.9rem;font-size:.82rem}
-  .market .go{margin-left:0}
 }
 
 /* ── 本项目覆盖：hero 左文右图、筛选分行、说明块两列 ── */
@@ -262,7 +236,6 @@ footer .motto{font-family:var(--mono);color:var(--seal)}
 .blocks code{font-family:var(--mono);font-size:.92em;color:var(--ink)}
 
 /* ══ 本项目风格（取自已封存的旧版）：纯纸底、系统字体、无阴影、小圆角、细描边 ══ */
-header.hero{background-image:none}                     /* 去掉上游的网格纹理 */
 *{text-rendering:optimizeLegibility}
 li.card,.panel,.searchbar,.noresult,#toTop,.chip,.toggle,.sortwrap select{border-radius:6px}
 .searchbar{box-shadow:none;border:1px solid var(--line-2)}
@@ -421,14 +394,12 @@ let sortBy = urlParams.get('sort') || 'dl';
 let onlyNpm = urlParams.get('npm') === '1';
 let onlyNew = urlParams.get('new') === '1';
 
-// Computed at load, not at build: a static page served for weeks would
-// otherwise keep filtering against the day it was generated.
+// 加载时计算，而不是构建时：静态页面会被缓存或长期提供，按生成当天的日期
+// 筛选会失真。
 //
-// Seven days, not thirty. `added` derives from git history and this repository
-// was initialised 2026-08-13, so every one of the 2,143 entries currently
-// carries a date inside the last two weeks — a 30-day window matches all of
-// them and the button does nothing. Seven selects ~43% today and keeps
-// selecting a useful slice once the history is long enough for either to work.
+// 窗口取七天。`added` 来自 git 历史，历史较短时更长的窗口会命中全部条目、
+// 这个按钮等于没有作用；七天能在近期新增的条目上生效，并且在历史变长之后
+// 仍然筛得出有意义的一部分。
 const cutoff = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
 
 // `data-dl` is absent — never "0" — for entries with no npm package, so a
@@ -541,7 +512,7 @@ document.addEventListener('click', async (e) => {
     setTimeout(() => { b.textContent = old; mi.classList.remove('done'); mi.closest('details').open = false; }, 900);
     return;
   }
-  const btn = e.target.closest('.cli .copy, .market .go');
+  const btn = e.target.closest('.cli .copy');
   if (btn) {
     await copyCmd(btn);
     btn.classList.add('done');
