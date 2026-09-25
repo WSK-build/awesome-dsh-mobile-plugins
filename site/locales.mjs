@@ -5,8 +5,8 @@
  *   1. Add an entry here (copy an existing one, translate every string).
  *   2. Create README.<code>.md with the same category headings you declare
  *      in `categories` and one `- [name](url) - description` line per plugin.
- *   3. Add banner-<code>.png and og-<code>.png to docs/ (render from the
- *      shared card template; see scripts notes).
+ *   3. og 图复用站点共用的 /logo-512.png：把该语言的 `og` 字段指向它即可，
+ *      不需要为新语言另外制作 banner 或 og 图片文件。
  *   4. Create site/privacy.<code>.html — the privacy page body, which is
  *      prose rather than UI strings and so lives in its own file.
  * Everything else — page, hreflang set, sitemap, JSON-LD — is generated.
@@ -33,12 +33,8 @@ export default [
     TITLE: 'awesome-dsh-mobile-plugins — mobile plugin collection for DeepSeek Harness',
     DESC: 'A curated collection of mobile-optimized plugins for DeepSeek Harness ({N} listed), with verification status and one paste-ready install command per entry.',
     SEARCH_PH: 'Search plugins…',
-    // Category and detail titles deliberately drop the "Awesome DSH Plugin"
-    // suffix the home page carries. Brand queries are the home page's to win;
-    // when every page claimed the brand too, these pages entered the same
-    // results and lost — measured at a third of the click-through their
-    // position should earn. They lead with what someone actually typed
-    // instead, and spend the freed characters on the intent words.
+    // 分类页与详情页的标题不带站点名：只有首页 TITLE 以 awesome-dsh-mobile-plugins
+    // 开头，其余页面直接以分类名或插件名领起，把标题预算里省下的字符留给意图词。
     // "dsh" rather than "DeepSeek Harness": search data says the phrase people
     // type is "dsh plugin", and the full product name appears in almost no
     // queries at all. Spelling it out costs 20 characters of a title budget
@@ -94,7 +90,6 @@ export default [
       SUBMIT_BODY: '<b>1.</b> Add one YAML file under <code translate="no">data/plugins/</code>, named <code translate="no">&lt;owner&gt;__&lt;repo&gt;.yml</code> (a monorepo subpackage: <code translate="no">&lt;owner&gt;__&lt;repo&gt;--&lt;subpath&gt;</code>).<br><b>2.</b> Fill it in like the example below \u2014 five keys only, anything else is rejected.<br><b>3.</b> Open a PR against main: CI checks the fields, the file name and the repository binding; once merged, the READMEs and this site regenerate themselves.',
       LISTING_PRE: 'Listing',
       LISTING_POST: 'plugins',
-      FULLLIST: 'Full list on GitHub ↗',
       WHATIS: 'What is DeepSeek Harness? ↗',
       NORESULT: 'No plugins match.',
       CLEAR: 'Clear filters',
@@ -112,7 +107,6 @@ export default [
       INSTALL_NOTE: 'Any plugin you install runs third-party code with your own permissions — it can read your files, use your credentials, and reach the network, and tool approvals don’t sandbox it. GitHub-sourced plugins also run build scripts at install time — pnpm blocks those until you allow them, so an install can stop with <code translate="no">ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED</code> or <code translate="no">ERR_PNPM_IGNORED_BUILDS</code>; dsh prints the exact key to add under <code translate="no">allowBuilds</code> in your profile’s <code translate="no">pnpm-workspace.yaml</code>, and the install works on the next run. Allowing a build is a trust decision: only install sources you trust, and pin a commit (<code translate="no">github:owner/repo#sha</code>).',
       CONTRIB: 'Add your plugin',
       CONTRIB_BODY: 'Open a PR against <a href="https://github.com/WSK-build/awesome-dsh-mobile-plugins" rel="noopener">this repository</a> — one YAML file under <code translate="no">data/plugins/</code> is the whole submission; the READMEs and this site regenerate automatically. Add the <a href="https://github.com/topics/dsh-plugin" rel="noopener"><code translate="no">dsh-plugin</code></a> topic to your repo too.',
-      MOTTO: 'Into the Unknown',
       NOTAFF: 'Unofficial repository, following an architecture close to awesome-dsh-plugin',
       DISCLAIMER: 'A listing is not an endorsement: plugins are third-party code. Mind your data and privacy when you install.',
       BLOCK_LIST_H: 'About listing',
@@ -127,10 +121,6 @@ export default [
       FILTER_CH: 'Install method',
       FILTER_DATE: 'Date listed',
       ALL: 'All',
-      MARKET_LEAD: '<b>dsh-market</b> — browse and install everything on this list inside DeepSeek Harness',
-      MARKET_LINK: 'About dsh-market ↗',
-      NAV_SUBMIT: 'Submit',
-      MARKET_GO: 'Get it',
       INSTALL_BTN: 'Install',
       MENU_MARKET: 'via dsh-market · recommended',
       MENU_MARKET_HINT: 'copy the market install command',
@@ -231,7 +221,6 @@ export default [
       SUBMIT_BODY: '<b>1.</b> 在 <code translate="no">data/plugins/</code> 下新增一个 YAML 文件，命名 <code translate="no">&lt;owner&gt;__&lt;repo&gt;.yml</code>（monorepo 子包用 <code translate="no">&lt;owner&gt;__&lt;repo&gt;--&lt;子路径&gt;</code>）。<br><b>2.</b> 按下例填写 \u2014\u2014 只允许 5 个键，多写字段会被直接拒绝。<br><b>3.</b> 向 main 提 PR：CI 校验字段、文件名与仓库绑定；合并后 README 与本站自动重新生成。',
       LISTING_PRE: '收录',
       LISTING_POST: '个插件',
-      FULLLIST: '完整列表（GitHub）↗',
       WHATIS: '什么是 DeepSeek Harness？↗',
       NORESULT: '没有匹配的插件。',
       CLEAR: '清除筛选',
@@ -249,7 +238,6 @@ export default [
       INSTALL_NOTE: '装任何插件都等于在你的机器上跑第三方代码，权限和你本人一样大——能读你的文件、用你的凭据、访问网络，工具审批管不到它。GitHub 来源的插件还会在安装时执行构建脚本——pnpm 默认拦截，所以安装可能停在 <code translate="no">ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED</code> 或 <code translate="no">ERR_PNPM_IGNORED_BUILDS</code>；dsh 会打印出需要添加的确切键名，把它加进该 profile 的 <code translate="no">pnpm-workspace.yaml</code> 的 <code translate="no">allowBuilds</code> 下，重跑一次即可装上。放行构建本身就是一次信任判断：请只安装可信来源，并尽量锁定 commit（<code translate="no">github:owner/repo#sha</code>）。',
       CONTRIB: '收录插件',
       CONTRIB_BODY: '给 <a href="https://github.com/WSK-build/awesome-dsh-mobile-plugins" rel="noopener">本仓库</a> 提一个 PR：在 <code translate="no">data/plugins/</code> 下新增一个 YAML 文件就是完整投稿，README 与本站会自动重新生成。也请为你的仓库打上 <a href="https://github.com/topics/dsh-plugin" rel="noopener"><code translate="no">dsh-plugin</code></a> topic。',
-      MOTTO: '探索未至之境',
       NOTAFF: '非官方仓库，沿用 awesome-dsh-plugin 仓库相近架构',
       DISCLAIMER: '收录不等于背书：插件是第三方代码，安装时注意数据安全和隐私保护。',
       BLOCK_LIST_H: '收录说明',
@@ -264,10 +252,6 @@ export default [
       FILTER_CH: '安装方式',
       FILTER_DATE: '收录日期',
       ALL: '全部',
-      MARKET_LEAD: '<b>dsh-market</b> —— 在 DeepSeek Harness 里直接逛并安装本列表全部插件',
-      MARKET_LINK: '了解 dsh-market ↗',
-      NAV_SUBMIT: '提交收录',
-      MARKET_GO: '获取',
       INSTALL_BTN: '安装',
       MENU_MARKET: '通过 dsh-market · 推荐',
       MENU_MARKET_HINT: '复制市场安装命令',

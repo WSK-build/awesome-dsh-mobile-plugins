@@ -51,7 +51,8 @@ permissions:
 #
 # Two groups, not one, and the second group is the whole point. The nightly is
 # the only run that probes with PROBE_ALL and the only run that publishes the
-# catalog and update notes to npm, and a cancelled nightly does neither: the
+# catalog to npm (`dsh-mobile-plugin-updates` is not published for now; its
+# script is kept for later use), and a cancelled nightly does neither: the
 # cache-save post-steps are skipped along with everything after them, so a run
 # killed 47 minutes into the probe throws that work away instead of banking it.
 # A push shares nothing with that — it must not be able to cancel it.

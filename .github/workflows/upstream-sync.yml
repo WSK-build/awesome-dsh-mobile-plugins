@@ -3,9 +3,11 @@ name: Sync upstream code (no data)
 # 定点搬运上游的**代码 / 站点 / 脚本**更新，永不搬它的数据：
 #   - 只按 tools/ours.config.json 里的 syncPaths 取文件；
 #   - data/、README*.md 不在列表里，所以它的条目与探测数据进不来；
-#   - 取完立刻用 tools/apply-ours.mjs 重新打我们的补丁（身份串 + wsl→phone 分类），
+#   - 归我们所有的文件（oursOwned）取件后用 git checkout HEAD -- 还原；
+#   - 再用 tools/apply-ours.mjs 重新打我们的补丁（身份串 + wsl→phone 分类 + 文本补丁），
 #     否则仓库名/域名/npm 包名会被改回它的、我们的分类会被还原；
 #   - 跑一遍自检（单测 + README 生成 + 站点构建）当门禁；
+#   - 自检会重写 README，进 PR 前先把 README 还原成我们的版本；
 #   - 最后**开 PR**，由人看过再合（要直推 main 就把最后一步的 gh pr create 换掉）。
 on:
   schedule:
@@ -28,11 +30,52 @@ jobs:
           node-version: 22
       - name: Fetch upstream
         run: |
-          git remote add upstream https://github.com/WSK-build/awesome-dsh-mobile-plugins.git
+          git remote add upstream https://github.com/awesome-dsh-plugin/awesome-dsh-plugin.git
           git fetch --depth 1 upstream main
       - name: Take upstream's code paths only
         run: |
-          git checkout FETCH_HEAD -- $(node tools/apply-ours.mjs --print-sync-paths)
+          # 上游可能没有 syncPaths 里的某个路径（例如将来改名/删掉某个目录），
+          # 不存在的 pathspec 会让 checkout 整体失败；先过滤，只提交在 FETCH_HEAD
+          # 里确实存在的路径。
+          paths="$(node tools/apply-ours.mjs --print-sync-paths)" \
+            || { echo "❌ 读取 syncPaths 失败（脚本或配置有问题），拒绝取件"; exit 1; }
+          if [ -z "$paths" ]; then
+            echo "❌ --print-sync-paths 没有输出，拒绝取件"
+            exit 1
+          fi
+          keep=""
+          for p in $paths; do
+            if [ -n "$(git ls-tree -r --name-only FETCH_HEAD -- "$p")" ]; then keep="$keep $p"; fi
+          done
+          # keep 为空时绝不能执行无 pathspec 的 checkout：那不是"取件"，
+          # 而会把 HEAD 切到 FETCH_HEAD，整棵树被上游版本覆盖。
+          # set -- 展开为位置参数：0 个参数即为空，不依赖"只用空格拼接"这个细节。
+          set -- $keep
+          if [ $# -eq 0 ]; then
+            echo "❌ 过滤后没有可取路径（FETCH_HEAD 未命中任何 syncPaths），拒绝 checkout"
+            exit 1
+          fi
+          git checkout FETCH_HEAD -- "$@"
+      - name: Restore files we own
+        run: |
+          # 取件是按目录取的，会连归我们所有的文件一起覆盖；用 HEAD 里的版本还原。
+          # 还原前逐个断言这些路径都在 HEAD 里：有缺失就打印是哪个并退出，
+          # 避免 git checkout 以 128 硬失败、错误信息不可读。
+          owned="$(node tools/apply-ours.mjs --print-ours-owned)" \
+            || { echo "❌ 读取 oursOwned 失败（脚本或配置有问题），拒绝还原"; exit 1; }
+          # set -- 展开为位置参数：空输出或仅空白都表现为 0 个参数，绝不能无参数 checkout。
+          set -- $owned
+          if [ $# -eq 0 ]; then
+            echo "❌ --print-ours-owned 没有输出任何路径，拒绝还原"
+            exit 1
+          fi
+          for p in "$@"; do
+            if [ -z "$(git ls-tree HEAD -- "$p")" ]; then
+              echo "❌ oursOwned 路径不在 HEAD 中（未跟踪或已被删除）：$p"
+              exit 1
+            fi
+          done
+          git checkout HEAD -- "$@"
       - name: Re-apply our patch (identity + category)
         run: node tools/apply-ours.mjs
       - run: npm ci
@@ -41,18 +84,43 @@ jobs:
           node scripts/generate-readme.mjs
           for f in scripts/*.test.mjs; do node --test "$f"; done
           SKIP_PUBLISH_CHECKS=1 node scripts/build-site.mjs
+      - name: Restore our READMEs before staging
+        run: |
+          # Self-checks 里的 generate-readme.mjs 会重写 README.md / README.zh.md；
+          # 这两个文件不在取件范围内、归我们所有，先还原成 HEAD 里的我们的版本，
+          # 下面那条「staged 变更里不得出现 README」的断言才不会把合法同步判红
+          # （断言保留，作为护栏）。
+          git checkout HEAD -- README.md README.zh.md
       - name: Stage and assert we never brought data or the CNAME
         run: |
-          # 先 add -A 再断言：add 之前索引里还是"补丁前"的上游原文件，断言会误报
+          # 顺序说明：取件时上游文件已随 checkout 写入索引；git add -A 把工作树里的
+          # 还原与删除同步进索引，索引才是最终要提交的内容，所以断言放在 add 之后。
           git add -A
-          # 数据与域名一律不许进来：这是本工作流存在的意义，所以要显式断言，不能只在文档里说
-          if git ls-files --error-unmatch site/assets/CNAME >/dev/null 2>&1; then
-            echo "❌ site/assets/CNAME 被带进索引（上游的自定义域名）"; exit 1
+          # 数据与自定义域名一律不许进来，必须显式断言，不能只在文档里说。
+          # 上游若把自定义域名文件挪到别的位置也要拦住，所以三个位置都查
+          # （removePaths 登记了同样三处，删除与断言互为兜底）。
+          for c in CNAME site/CNAME site/assets/CNAME; do
+            if git ls-files --error-unmatch "$c" >/dev/null 2>&1; then
+              echo "❌ $c 被带进索引（上游的自定义域名）"; exit 1
+            fi
+          done
+          # 上游往 site/assets/ 里塞的素材（字体、og 图等）我们不要；取件是 overlay、
+          # 从不删文件，所以新素材会静静漏进 PR，必须拦 staged 中的新增文件。
+          # 处置指引：上游新增素材触发这里时，报错会打印具体文件名，
+          # 把这些文件登记进 tools/ours.config.json 的 removePaths 即可转绿。
+          if [ -n "$(git diff --cached --name-status --diff-filter=A -- site/assets)" ]; then
+            echo "❌ site/assets/ 下出现新增文件（上游素材不进本仓）"
+            git diff --cached --name-status --diff-filter=A -- site/assets
+            exit 1
           fi
+          # 下面 data/、README 与上面的 CNAME、site/assets 这几条断言，在当前步骤集合下
+          # 都不会触发：取件范围本就不含 data/，README 在 staging 前已从 HEAD 还原，
+          # CNAME 与上游素材由 removePaths 先删。它们是冗余护栏，断言保留作回归保险；
+          # 真正的防线是"取件范围本来就只含代码目录"这件事本身。
           if git diff --cached --name-only | grep -Eq '^(data/|README\.md|README\.zh\.md)'; then
             echo "❌ 变更里出现了 data/ 或 README，超出取件范围"; git diff --cached --name-only; exit 1
           fi
-          echo "取件范围校验通过：没有 data/、README、CNAME"
+          echo "取件范围校验通过：没有 data/、README、CNAME、site/assets 新增"
 
       - name: Open a PR if anything changed
         env:
@@ -70,7 +138,7 @@ jobs:
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" \
             --title "chore: 同步上游代码/站点/脚本" \
-            --body "自动同步 [awesome-dsh-plugin](https://github.com/WSK-build/awesome-dsh-mobile-plugins) 的代码/站点/脚本。
+            --body "自动同步 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的代码/站点/脚本。
 
           - 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
           - 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）

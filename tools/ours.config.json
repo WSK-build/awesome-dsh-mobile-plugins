@@ -5,11 +5,8 @@
     "scripts",
     "site",
     ".github",
-    "design-mocks",
-    "contributing.md",
     "package.json",
-    "package-lock.json",
-    ".gitignore"
+    "package-lock.json"
   ],
   "oursOwned": [
     "site/template.html",
@@ -21,10 +18,13 @@
     "site/assets",
     "contributing.md",
     "scripts/generate-readme.mjs",
-    "scripts/build-site.mjs"
+    "scripts/build-site.mjs",
+    ".gitignore",
+    "design-mocks"
   ],
   "neverSwap": [
-    ".github/workflows/upstream-sync.yml"
+    ".github/workflows/upstream-sync.yml",
+    "scripts/maint-rebase.sh"
   ],
   "identitySwaps": [
     ["awesome-dsh-plugin/awesome-dsh-plugin", "WSK-build/awesome-dsh-mobile-plugins"],
@@ -45,23 +45,67 @@
     "fromLabelZh": "WSL 与 Windows 互操作",
     "toLabelZh": "手机控制"
   },
-  "_removePaths说明": "这些文件每次同步后都要删掉：上游有、但我们不要（自定义域名、字体、广告位、它自己的社交卡片）。删了之后 git add -A 会把删除入账，正好抵消取件时把它们带进索引。",
+  "_replacements说明": "声明式文本补丁：保住我们对上游文件的少量改动（这些文件不在 oursOwned 里，每次取件都会被上游版本覆盖）。每条 { file, from, to } 的语义与 categoryRename 一致：file 里已含 to 就跳过；既无 to 也无 from 记入 drift 并退出非零；否则把 file 里的 from 替换为 to。from/to 只覆盖要改的那一小段文本，不吞周边内容。",
+  "replacements": [
+    {
+      "file": "scripts/publish-catalog.mjs",
+      "from": "execFileSync('npm', args, { stdio: 'inherit', cwd: stage })",
+      "to": "if (process.platform === 'win32') {\n  // Windows 上 npm 是 npm.cmd，而 Node 18+ 不允许直接 spawn .cmd（EINVAL）→ 必须走 shell；\n  // 走 shell 时把整条命令作为单字符串传（不传 args 数组），避免 Node 的 DEP0190 弃用警告。\n  execFileSync(`npm ${args.join(' ')}`, { stdio: 'inherit', cwd: stage, shell: true })\n} else {\n  execFileSync('npm', args, { stdio: 'inherit', cwd: stage })\n}"
+    },
+    {
+      "file": "scripts/publish-updates.mjs",
+      "from": "execFileSync('npm', args, { stdio: 'inherit', cwd: stage })",
+      "to": "if (process.platform === 'win32') {\n  // Windows 上 npm 是 npm.cmd，而 Node 18+ 不允许直接 spawn .cmd（EINVAL）→ 必须走 shell；\n  // 走 shell 时把整条命令作为单字符串传（不传 args 数组），避免 Node 的 DEP0190 弃用警告。\n  execFileSync(`npm ${args.join(' ')}`, { stdio: 'inherit', cwd: stage, shell: true })\n} else {\n  execFileSync('npm', args, { stdio: 'inherit', cwd: stage })\n}"
+    },
+    {
+      "file": ".github/pull_request_template.md",
+      "from": "memory tools wsl browser",
+      "to": "memory tools phone browser"
+    },
+    {
+      "file": ".github/workflows/build-site.yml",
+      "from": "# catalog and update notes to npm, and a cancelled nightly does neither: the",
+      "to": "# catalog to npm (`dsh-mobile-plugin-updates` is not published for now; its\n# script is kept for later use), and a cancelled nightly does neither: the"
+    },
+    {
+      "file": "scripts/publish-catalog.mjs",
+      "from": "const built = fs.readFileSync(BUILT)",
+      "to": "if (!fs.existsSync(BUILT)) {\n  console.error(`缺少 ${BUILT}，无法发布。请先运行 \\`node scripts/build-site.mjs\\` 生成该文件。`)\n  process.exit(1)\n}\nconst built = fs.readFileSync(BUILT)"
+    },
+    {
+      "file": "package-lock.json",
+      "from": "https://registry.npmmirror.com/dsh-trust-check/-/dsh-trust-check-0.1.13.tgz",
+      "to": "https://registry.npmjs.org/dsh-trust-check/-/dsh-trust-check-0.1.13.tgz"
+    },
+    {
+      "file": "package-lock.json",
+      "from": "https://registry.npmmirror.com/js-yaml/-/js-yaml-4.3.2.tgz",
+      "to": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.2.tgz"
+    }
+  ],
+  "_removePaths说明": "这些文件每次同步后都要删掉：上游有、但我们不要（自定义域名、字体、广告位、徽章与社交卡片等上游素材）。删了之后 git add -A 会把删除入账，正好抵消取件时把它们带进索引。",
   "_stripWorkflowSteps说明": "上游同步会把它的步骤带回来。这里登记的是『同步后一律删掉』的步骤——按 step 名整段删（含其上方紧邻的注释）。",
   "stripWorkflowSteps": [
     { "file": ".github/workflows/build-site.yml", "step": "publish the update notes to npm" }
   ],
   "removePaths": [
+    "CNAME",
+    "site/CNAME",
     "site/assets/CNAME",
     "site/assets/ads.txt",
     "site/assets/archivo-latin.woff2",
     "site/assets/archivo-latin-ext.woff2",
     "site/assets/og-en.png",
-    "site/assets/og-zh.png"
+    "site/assets/og-zh.png",
+    "site/assets/badge.svg",
+    "site/assets/banner-en.png",
+    "site/assets/banner-zh.png"
   ],
   "_同步永不包含（含已删除项）": [
     "data/（上游的条目与探测数据）",
     "README.md / README.zh.md（由我们的 generate-readme.mjs 从我们的数据生成，正文含我们的署名段）",
     "tools/（我们自己的脚本与配置）",
-    "THIRD_PARTY_NOTICES.md 等本地文档"
+    "THIRD_PARTY_NOTICES.md 等本地文档",
+    "contributing.md / .gitignore / design-mocks（归我们所有，只在 oursOwned 里，不参与取件）"
   ]
 }

@@ -31,5 +31,3 @@ ANNOUNCE.md
 .playwright-mcp/
 # 只在探测缓存里存在、不入库
 data/updates.json
-# 发布快照目录（无历史的导出）
-../_release/

@@ -20,6 +20,10 @@ import { firstAddedDate } from './lib/added-dates.mjs'
 import { slugOf, termOf } from './lib/terms.mjs'
 
 const ORIGIN = 'https://wsk-build.github.io/awesome-dsh-mobile-plugins'
+// 仅主机名（https://wsk-build.github.io）。loc.urlPath / privacyPath / feed 本身
+// 已经带仓库路径，与它们拼接成绝对地址时必须用 HOST，否则前缀会出现两遍；
+// ORIGIN 用于站点根本身，以及不带路径的图片（loc.og 形如 /logo-512.png）。
+const HOST = new URL(ORIGIN).origin
 
 // 本项目部署在 GitHub Pages 的**项目站**下（/<repo>/），因此站点内的绝对链接都要带这段前缀；
 // 但生成文件的**输出目录**不能带（docs/ 就是站点根）。这里从 ORIGIN 推出前缀，避免两处硬编码。
@@ -65,23 +69,28 @@ const ldSafe = (s) => s.replaceAll('<', '\\u003c')
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 // ── advertising ─────────────────────────────────────────────────────────────
-// One AdSense head tag, gated behind a build variable. Unset — the default —
-// emits nothing at all, so an unconfigured build is byte-identical to an
-// ad-free one and no third-party script is requested.
+// 广告脚本由构建变量 ADSENSE_CLIENT 开关：未设置（默认）时 adHead() 返回空串，
+// 产物与不投放广告的构建逐字节相同，不会请求任何第三方脚本。
 //
-// Auto ads decide placement from this tag alone, so there is no slot markup to
-// write and no reserved height to get wrong. The publisher id is a `vars`
-// entry rather than a secret because it ships in the HTML either way.
+// 只有 site/detail-template.html 带 __AD_HEAD__ 占位符；site/template.html 与
+// site/privacy-template.html 没有该占位符，隐私页的构建循环也不做这项替换，
+// 因此首页、分类页与隐私页在任何配置下都不注入广告脚本。
+//
+// 该标签若被启用，靠 Auto ads 一个标签决定广告位，页面里没有需要写的广告位
+// 标记，也没有预留高度要对齐。publisher id 是 `vars` 里的项而不是秘密，因为它
+// 无论如何都会随 HTML 一起发布。
 const ADSENSE_CLIENT = process.env.ADSENSE_CLIENT || ''
 const adHead = () =>
   ADSENSE_CLIENT
     ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(ADSENSE_CLIENT)}" crossorigin="anonymous"></script>\n`
     : ''
-// The token sits on its own line in every template, so the match takes the
-// newline with it. Otherwise an unconfigured build leaves a blank line behind
-// and "identical to an ad-free build" stops being literally true — which is
-// the one claim about this feature worth being able to check by diffing.
-const AD_HEAD_TOKEN = '__AD_HEAD__\n'
+// 占位符在模板里独占一行，替换要连行尾一起消费：否则未配置的构建会留下一个
+// 空行，「与不投放广告的构建逐字节相同」就不再是能靠 diff 验证的事实。
+// 行尾必须容忍 CRLF：模板的行尾由检出方式与编辑器决定（Windows 上
+// core.autocrlf 会把模板写成 \r\n），固定写 '\n' 的字符串在 CRLF 模板上永不
+// 命中，replaceAll 是空操作，字面量 __AD_HEAD__ 会原样留在详情页 </style> 与
+// </head> 之间，被 HTML 当成一行文本渲染出来。
+const AD_HEAD_TOKEN = /__AD_HEAD__\r?\n?/
 
 // Comments are deliberately opt-in. A half-configured widget would otherwise
 // turn every detail page into a broken third-party request, so fail loudly only
@@ -166,6 +175,9 @@ console.log(`${entries.length} entries parsed across ${LOCALES.length} locales`)
 
 const ordered = CAT_IDS.flatMap((id) => entries.filter((e) => e.cat === id))
 const N = ordered.length
+// 分类页只为有条目的分类生成，因此指向分类页的链接（分类 chip、sitemap）也只列
+// 这些分类，否则会指向不存在的页面。首页筛选器里的 chip 是按钮而非链接，仍列全部分类。
+const LIVE_CATS = CAT_IDS.filter((id) => ordered.some((e) => e.cat === id))
 
 // Added dates. data/added-dates.json is a frozen, human-owned baseline: it
 // pins the dates published before 2026-08-15 and carries manual migrations
@@ -461,14 +473,14 @@ for (const e of ordered) {
 }
 
 const hreflangs = [
-  ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${l.urlPath}">`),
-  `<link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}">`,
+  ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${HOST}${l.urlPath}">`),
+  `<link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}">`,
 ].join('\n')
 
 const jsonld = (url) => JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'Awesome DSH Plugin',
+  name: 'awesome-dsh-mobile-plugins',
   url,
   numberOfItems: N,
   itemListElement: ordered.map((e, i) => ({ '@type': 'ListItem', position: i + 1, name: e.name, url: e.url })),
@@ -574,9 +586,10 @@ function buildChips(loc) {
 }
 
 function buildChipLinks(loc, activeId) {
+  // 只列有条目的分类：空分类不生成页面，链接过去就是 404。
   return [
     `      <a class="chip${activeId ? '' : ' active'}" href="${loc.urlPath}">${loc.strings.ALL} <small>${N}</small></a>`,
-    ...CAT_IDS.map((id) => {
+    ...LIVE_CATS.map((id) => {
       const n = ordered.filter((e) => e.cat === id).length
       return `      <a class="chip${id === activeId ? ' active' : ''}" href="${loc.urlPath}${id}/">${loc.categories[id]} <small>${n}</small></a>`
     }),
@@ -600,14 +613,14 @@ const master = fs.readFileSync('site/template.html', 'utf8')
 
 for (const loc of LOCALES) {
   let page = master
-  page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, () => `<script type="application/ld+json">${ldSafe(jsonld(ORIGIN + loc.urlPath))}</script>`)
+  page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, () => `<script type="application/ld+json">${ldSafe(jsonld(HOST + loc.urlPath))}</script>`)
   page = page.replace(/(<ol class="dex" id="dex">)[\s\S]*?(<\/ol>)/, (m, a, b) => `${a}\n\n${buildRows(loc)}\n\n  ${b}`)
   page = page.replace(/(<div class="filters" id="filters">)[\s\S]*?(<\/div><!--\/filters-->)/, (m, a, b) => `${a}\n${buildChips(loc)}\n    ${b}`)
   page = page
     .replaceAll('__LANG__', () => loc.htmlLang)
     .replaceAll('__TITLE__', () => loc.TITLE)
     .replaceAll('__DESC__', () => loc.DESC.replace('{N}', N))
-    .replaceAll('__URL__', () => ORIGIN + loc.urlPath)
+    .replaceAll('__URL__', () => HOST + loc.urlPath)
     .replaceAll('__HREFLANGS__', () => hreflangs)
     .replaceAll('__OG_IMAGE__', () => ORIGIN + loc.og)
     .replaceAll('__LOCALE_LINKS__', () => localeLinks(loc))
@@ -622,7 +635,7 @@ for (const loc of LOCALES) {
     // around them, which is what made #count the single largest contributor to
     // this site's CLS. Same number either way — it just arrives before paint.
     .replaceAll('__CARD_COUNT__', () => String(N))
-    .replaceAll(AD_HEAD_TOKEN, () => adHead())
+    .replace(AD_HEAD_TOKEN, () => adHead())
   for (const [k, v] of Object.entries(loc.strings)) page = page.replaceAll(`__T_${k}__`, () => v)
   fs.mkdirSync(loc.out.split('/').slice(0, -1).join('/'), { recursive: true })
   fs.writeFileSync(loc.out, page)
@@ -632,7 +645,7 @@ for (const loc of LOCALES) {
 const catJsonld = (url, id) => JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: 'Awesome DSH Plugin',
+  name: 'awesome-dsh-mobile-plugins',
   url,
   numberOfItems: ordered.filter((e) => e.cat === id).length,
   itemListElement: ordered.filter((e) => e.cat === id).map((e, i) => ({ '@type': 'ListItem', position: i + 1, name: e.name, url: e.url })),
@@ -641,10 +654,10 @@ for (const loc of LOCALES) {
   for (const id of CAT_IDS) {
     const n = ordered.filter((e) => e.cat === id).length
     if (!n) continue
-    const url = `${ORIGIN}${loc.urlPath}${id}/`
+    const url = `${HOST}${loc.urlPath}${id}/`
     const catHreflangs = [
-      ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${l.urlPath}${id}/">`),
-      `<link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}${id}/">`,
+      ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${HOST}${l.urlPath}${id}/">`),
+      `<link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}${id}/">`,
     ].join('\n')
     let page = master
     page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, () => `<script type="application/ld+json">${ldSafe(catJsonld(url, id))}</script>`)
@@ -670,7 +683,7 @@ for (const loc of LOCALES) {
       // that number, not the site total. See the index block for why these are
       // server-rendered.
       .replaceAll('__CARD_COUNT__', () => String(n))
-      .replaceAll(AD_HEAD_TOKEN, () => adHead())
+      .replace(AD_HEAD_TOKEN, () => adHead())
     for (const [k, v] of Object.entries(loc.strings)) page = page.replaceAll(`__T_${k}__`, () => v)
     const outDir = loc.out.replace(/index\.html$/, '') + id
     fs.mkdirSync(outDir, { recursive: true })
@@ -688,10 +701,10 @@ for (const loc of LOCALES) {
     console.error(`${loc.readme}'s locale declares privacyBody ${loc.privacyBody}, which does not exist`)
     process.exit(1)
   }
-  const url = ORIGIN + loc.privacyPath
+  const url = HOST + loc.privacyPath
   const pHreflangs = [
-    ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${l.privacyPath}">`),
-    `<link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].privacyPath}">`,
+    ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${HOST}${l.privacyPath}">`),
+    `<link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].privacyPath}">`,
   ].join('\n')
   let page = privacyMaster
     .replaceAll('__LANG__', () => loc.htmlLang)
@@ -784,11 +797,11 @@ function renderReadme(rm) {
 }
 for (const loc of LOCALES) {
   for (const e of ordered) {
-    const url = `${ORIGIN}${loc.urlPath}p/${e.slug}/`
+    const url = `${HOST}${loc.urlPath}p/${e.slug}/`
     const catUrl = `${loc.urlPath}${e.cat}/`
     const dHreflangs = [
-      ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${l.urlPath}p/${e.slug}/">`),
-      `<link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}p/${e.slug}/">`,
+      ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${HOST}${l.urlPath}p/${e.slug}/">`),
+      `<link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}p/${e.slug}/">`,
     ].join('\n')
     const desc = e.descs[loc.code]
     // Trim to a boundary rather than mid-word: a description cut at "config" ->
@@ -881,8 +894,8 @@ for (const loc of LOCALES) {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: loc.strings.CRUMB_ALL, item: `${ORIGIN}${loc.urlPath}` },
-        { '@type': 'ListItem', position: 2, name: loc.categories[e.cat], item: `${ORIGIN}${catUrl}` },
+        { '@type': 'ListItem', position: 1, name: loc.strings.CRUMB_ALL, item: `${HOST}${loc.urlPath}` },
+        { '@type': 'ListItem', position: 2, name: loc.categories[e.cat], item: `${HOST}${catUrl}` },
         { '@type': 'ListItem', position: 3, name: e.name, item: url },
       ],
     }])
@@ -943,7 +956,7 @@ ${readmeHtml}
       .replaceAll('__PRIVACY__', () => loc.privacyPath)
       .replaceAll('__LOCALE_LINKS__', () => LOCALES.filter((l) => l.code !== loc.code).map((l) => `<a class="lang-btn" href="${l.urlPath}p/${e.slug}/" hreflang="${l.code}" rel="alternate">${l.label}</a>`).join('\n        '))
       .replaceAll('__CAT_URL__', () => catUrl)
-      .replaceAll(AD_HEAD_TOKEN, () => adHead())
+      .replace(AD_HEAD_TOKEN, () => adHead())
       .replaceAll('__CAT_NAME__', () => loc.categories[e.cat])
       .replaceAll('__P_SHORT__', () => esc(short))
       .replaceAll('__P_H1__', () => h1)
@@ -988,9 +1001,9 @@ for (const loc of LOCALES) {
   const feed = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>${esc(loc.TITLE)}</title>
-  <id>${ORIGIN}${loc.urlPath}</id>
-  <link href="${ORIGIN}${loc.urlPath}"/>
-  <link rel="self" href="${ORIGIN}${loc.feed}"/>
+  <id>${HOST}${loc.urlPath}</id>
+  <link href="${HOST}${loc.urlPath}"/>
+  <link rel="self" href="${HOST}${loc.feed}"/>
   <updated>${isoTs([...ordered].map((e) => e.addedAt).sort().pop())}</updated>
 ${recent.map((e) => `  <entry>
     <title>${esc(e.name)}</title>
@@ -1133,34 +1146,34 @@ const PRIVACY_LASTMOD = (() => {
   return out || new Date().toISOString().slice(0, 10)
 })()
 const alternates = [
-  ...LOCALES.map((l) => `      <xhtml:link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${l.urlPath}"/>`),
-  `      <xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}"/>`,
+  ...LOCALES.map((l) => `      <xhtml:link rel="alternate" hreflang="${l.code}" href="${HOST}${l.urlPath}"/>`),
+  `      <xhtml:link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}"/>`,
 ].join('\n')
 fs.writeFileSync('docs/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${LOCALES.map((l) => `  <url>
-    <loc>${ORIGIN}${l.urlPath}</loc>
+    <loc>${HOST}${l.urlPath}</loc>
     <lastmod>${lastAdded}</lastmod>
     <changefreq>daily</changefreq>
 ${alternates}
   </url>`).join('\n')}
-${LOCALES.flatMap((l) => CAT_IDS.map((id) => `  <url>
-    <loc>${ORIGIN}${l.urlPath}${id}/</loc>
+${LOCALES.flatMap((l) => LIVE_CATS.map((id) => `  <url>
+    <loc>${HOST}${l.urlPath}${id}/</loc>
     <lastmod>${lastAdded}</lastmod>
     <changefreq>daily</changefreq>
-${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${ORIGIN}${l2.urlPath}${id}/"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}${id}/"/>`].join('\n')}
+${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${HOST}${l2.urlPath}${id}/"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}${id}/"/>`].join('\n')}
   </url>`)).join('\n')}
 ${LOCALES.map((l) => `  <url>
-    <loc>${ORIGIN}${l.privacyPath}</loc>
+    <loc>${HOST}${l.privacyPath}</loc>
     <lastmod>${PRIVACY_LASTMOD}</lastmod>
     <changefreq>yearly</changefreq>
-${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${ORIGIN}${l2.privacyPath}"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].privacyPath}"/>`].join('\n')}
+${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${HOST}${l2.privacyPath}"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].privacyPath}"/>`].join('\n')}
   </url>`).join('\n')}
 ${LOCALES.flatMap((l) => ordered.map((e) => `  <url>
-    <loc>${ORIGIN}${l.urlPath}p/${e.slug}/</loc>
+    <loc>${HOST}${l.urlPath}p/${e.slug}/</loc>
     <lastmod>${e.added}</lastmod>
     <changefreq>weekly</changefreq>
-${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${ORIGIN}${l2.urlPath}p/${e.slug}/"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}${LOCALES[0].urlPath}p/${e.slug}/"/>`].join('\n')}
+${[...LOCALES.map((l2) => `      <xhtml:link rel="alternate" hreflang="${l2.code}" href="${HOST}${l2.urlPath}p/${e.slug}/"/>`), `      <xhtml:link rel="alternate" hreflang="x-default" href="${HOST}${LOCALES[0].urlPath}p/${e.slug}/"/>`].join('\n')}
   </url>`)).join('\n')}
 </urlset>
 `)

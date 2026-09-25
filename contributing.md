@@ -21,11 +21,15 @@ longer without making it better.
 ## 收录门槛 / What we require
 
 **1. 仓库属于作者自己 / The repository is the author's own.**
-`url` 必须指向你要提交的那个插件自己的仓库；如果还提供 `tarball`，它必须来自**同一个**仓库的 Release。
-列一个可信仓库、却从别处拉包，是最常见的抢注手法，CI 直接拒绝。
-`url` must be the repository of the plugin you are submitting, and a `tarball`, if present, must come from a
-release of **that same** repository. Pointing at a trustworthy repo while pulling the package from elsewhere is
-the classic squatting move, and CI rejects it.
+`url` 必须指向你要提交的那个插件自己的仓库。如果还提供 `tarball`，CI 自动校验的是它的下载地址与文件类型：
+必须是 https，host 限于 `github.com`、`objects.githubusercontent.com`、`release-assets.githubusercontent.com`，
+`github.com` 上的地址必须含 `/releases/`，路径必须以 `.tgz` 或 `.tar.gz` 结尾。是否与 `url` 指向同一个仓库
+由人工审核确认，发现不一致会拒绝收录。
+`url` must be the repository of the plugin you are submitting. For a `tarball`, if present, CI automatically checks
+the download address and the file type: it must be https, the host must be `github.com`,
+`objects.githubusercontent.com` or `release-assets.githubusercontent.com`, an address on `github.com` must contain
+`/releases/`, and the path must end in `.tgz` or `.tar.gz`. Whether it comes from the same repository as `url` is
+confirmed during human review; a mismatch is refused.
 
 **2. 不接搬运、复刻与聚合包 / No re-uploads, clones or aggregator bundles.**
 必须是作者本人的作品（或被授权代为提交）。聚合包的依赖必须解析到原作者的仓库或其 npm 包——把别人的插件
@@ -108,8 +112,8 @@ same rule.
 
 ## CI 与评审会查什么 / What CI checks
 
-一个 PR 依次过这些（`pr-check.yml`）：
-A pull request goes through these (`pr-check.yml`):
+一个 PR 依次过这些（提交门禁在 `pr-gate.yml` 里运行，结论以名为 `Submission gate` 的 check 报告；README 校验与站点构建在 `pr-check.yml` 里运行）：
+A pull request goes through these (the submission gate runs in `pr-gate.yml` and reports its verdict as the `Submission gate` check; the README check and the site build run in `pr-check.yml`):
 
 1. 提交门禁 `check-submission.mjs`：仓库是否 archived、创建是否满 1 天、清单/manifest、条目与仓库的绑定关系；
 2. `generate-readme.mjs --check`：**README 必须与 `data/plugins/` 一致**——你只改条目，README 由 CI 重新生成，
