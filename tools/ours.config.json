@@ -46,6 +46,10 @@
     "toLabelZh": "手机控制"
   },
   "_removePaths说明": "这些文件每次同步后都要删掉：上游有、但我们不要（自定义域名、字体、广告位、它自己的社交卡片）。删了之后 git add -A 会把删除入账，正好抵消取件时把它们带进索引。",
+  "_stripWorkflowSteps说明": "上游同步会把它的步骤带回来。这里登记的是『同步后一律删掉』的步骤——按 step 名整段删（含其上方紧邻的注释）。",
+  "stripWorkflowSteps": [
+    { "file": ".github/workflows/build-site.yml", "step": "publish the update notes to npm" }
+  ],
   "removePaths": [
     "site/assets/CNAME",
     "site/assets/ads.txt",
