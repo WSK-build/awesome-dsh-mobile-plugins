@@ -1,0 +1,62 @@
+name: Probe PR creation permission
+
+# 临时诊断用：查清"同一枚 GITHUB_TOKEN 能否创建 PR"。
+# 不参与任何业务，用完后删除。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 令牌与仓库设置
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "repo=$GITHUB_REPOSITORY actor=${{ github.actor }} event=${{ github.event_name }}"
+          gh api -i /repos/$GITHUB_REPOSITORY/actions/permissions/workflow || true
+
+      - name: 造一个一次性分支（空提交）
+        run: |
+          git config user.name "probe-bot"
+          git config user.email "probe-bot@users.noreply.github.com"
+          git checkout -b "probe/pr-permission-${{ github.run_id }}"
+          git commit --allow-empty -m "probe: empty commit"
+          git push -u origin "probe/pr-permission-${{ github.run_id }}"
+
+      - name: REST POST /pulls（打印状态码与响应头）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          out=$(gh api -i --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "repos/$GITHUB_REPOSITORY/pulls" \
+            -f title="probe: REST 建 PR" \
+            -f head="probe/pr-permission-${{ github.run_id }}" \
+            -f base=main \
+            -f body="诊断用，随后关闭" 2>&1)
+          rc=$?
+          set -e
+          printf '%s\n' "$out"
+          echo "REST rc=$rc"
+
+      - name: GraphQL 路径对照（gh pr create）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          out=$(gh pr create --repo "$GITHUB_REPOSITORY" --base main \
+            --head "probe/pr-permission-${{ github.run_id }}" \
+            --title "probe: GraphQL 建 PR" --body "诊断用，随后关闭" 2>&1)
+          rc=$?
+          set -e
+          printf '%s\n' "$out"
+          echo "GraphQL rc=$rc"
