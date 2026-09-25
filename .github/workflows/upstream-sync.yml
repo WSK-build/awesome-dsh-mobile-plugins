@@ -8,6 +8,8 @@ name: Sync upstream code (no data)
 #     否则仓库名/域名/npm 包名会被改回它的、我们的分类会被还原；
 #   - 跑一遍自检（单测 + README 生成 + 站点构建）当门禁；
 #   - 自检会重写 README，进 PR 前先把 README 还原成我们的版本；
+#   - .github/workflows/** 的改动**不进提交**：默认 GITHUB_TOKEN 无权推送工作流文件
+#     （GitHub 不向它开放 workflows 权限），这些改动只在 PR 正文里列出、由人工在本机合并；
 #   - 最后**开 PR**，由人看过再合（要直推 main 就把最后一步的 gh pr create 换掉）。
 on:
   schedule:
@@ -122,26 +124,78 @@ jobs:
           fi
           echo "取件范围校验通过：没有 data/、README、CNAME、site/assets 新增"
 
+      - name: Drop upstream workflow changes (the default token cannot push them)
+        id: workflows
+        run: |
+          # GITHUB_TOKEN 是 GitHub Actions 这个 App 的安装令牌，GitHub 不向它开放 workflows 权限
+          # （permissions: 的合法键里也没有这一项），所以推送任何触碰 .github/workflows/** 的分支
+          # 都会被服务端拒收：refusing to allow a GitHub App to create or update workflow ...
+          # without `workflows` permission。因此这些改动从本次提交里撤掉，只在 PR 正文里列出、
+          # 由人工在本机合并——上游对 CI 的改动本来也该有人看一眼。
+          changed="$(git diff --cached --name-only -- .github/workflows)"
+          if [ -z "$changed" ]; then exit 0; fi
+          for f in $changed; do
+            if git cat-file -e "HEAD:$f" 2>/dev/null; then
+              git checkout HEAD -- "$f"              # 我们已有的：还原成 HEAD 版本
+            else
+              git rm -q --cached "$f"; rm -f "$f"    # 上游新增的：从索引与工作区移除
+            fi
+          done
+          {
+            echo "skipped<<EOF"
+            echo "$changed"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "::notice::上游改动了这些工作流文件，已从本次 PR 剔除：$(echo $changed | tr '\n' ' ')"
+
       - name: Open a PR if anything changed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIPPED: ${{ steps.workflows.outputs.skipped }}
         run: |
+          empty=''
           if git diff --cached --quiet; then
-            echo "上游没有带来变化"
-            exit 0
+            # 只有工作流改动时也要开 PR：那是唯一能把「需人工合并」的清单送出去的渠道，
+            # 否则这些改动会被静默丢掉（这时提交是空提交）。
+            if [ -z "$SKIPPED" ]; then
+              echo "上游没有带来变化"
+              exit 0
+            fi
+            empty=1
           fi
+
+          body="自动同步 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的代码/站点/脚本。
+
+          - 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
+          - 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）
+          - 已通过：上游单测、README 重新生成、站点构建"
+
+          if [ -n "$SKIPPED" ]; then
+            body="$body
+
+          **上游还改动了这些工作流文件，已从本次同步中剔除**（默认 \`GITHUB_TOKEN\` 无权推送 \`.github/workflows/**\`，GitHub 不向它开放 \`workflows\` 权限）。请先在本机合并，再合本 PR：
+
+          \`\`\`
+          git fetch upstream main && git checkout FETCH_HEAD -- .github/workflows && node tools/apply-ours.mjs
+          \`\`\`
+
+          $SKIPPED"
+          fi
+
+          body="$body
+
+          请人工过一眼上游这次改了什么再合。"
+
           branch="chore/upstream-sync-${GITHUB_RUN_ID}"
           git checkout -b "$branch"
           git config user.name "catalog-bot"
           git config user.email "catalog-bot@users.noreply.github.com"
-          git commit -m "chore: 同步上游代码/站点/脚本（身份与分类补丁已重新应用）"
+          if [ -n "$empty" ]; then
+            git commit --allow-empty -m "chore: 上游工作流有改动，需在本机合并（本次无其它变更）"
+          else
+            git commit -m "chore: 同步上游代码/站点/脚本（身份与分类补丁已重新应用）"
+          fi
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" \
             --title "chore: 同步上游代码/站点/脚本" \
-            --body "自动同步 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的代码/站点/脚本。
-
-          - 取件范围：\`tools/ours.config.json\` 的 \`syncPaths\`（**不含** \`data/\`、\`README*.md\`）
-          - 已重新应用我们的补丁：身份串 + \`wsl\` → \`phone\`（🕹️ 手机控制）
-          - 已通过：上游单测、README 重新生成、站点构建
-
-          请人工过一眼上游这次改了什么再合。"
+            --body "$body"
