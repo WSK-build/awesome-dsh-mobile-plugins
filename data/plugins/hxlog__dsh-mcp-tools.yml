@@ -1,0 +1,6 @@
+url: https://github.com/hxlog/dsh-mcp-tools
+name: hxlog/dsh-mcp-tools
+category: tools
+description:
+  en: 'MCP tool manager in DSH Settings: add MCP servers, Postman-style request headers, connection test, and per-tool on/off switches — zero dependencies, no install scripts, settings-page UI.'
+  zh: 'DSH 设置页里的 MCP 工具管理器：添加 MCP 服务器、Postman 式请求头、连通性测试、逐工具开关。零依赖、无安装脚本，带设置页 UI。'
