@@ -2,5 +2,5 @@ url: https://github.com/yinfenAce/dsh-sidebar-optimization
 name: "yinfenAce/dsh-sidebar-optimization#侧边栏优化"
 category: ui
 description:
-  en: 'DSHBox sidebar enhancement: 45–100% width, scene presets, double-tap quick actions, balance privacy/warning/auto-hide with a low-balance dot, reading density, accent colors, multi-wallet display, settings backup and diagnostics, Chinese/English UI; draggable ☰, left/right layout, adjustable swipe zone, copy and keyboard fixes. Targets DSHBox 1.4+/1.5.x, DSH 0.2.x and Android 10+; tested on 1.5.1 / 0.2.1-rc.5 / Android 14.'
-  zh: 'DSHBox 侧边栏增强：45–100% 宽度、场景预设、双击快捷面板、余额隐私/预警/自动隐藏与低额红点、阅读密度、强调色、多钱包显示、设置备份与诊断、中英文界面；☰ 拖动、左右布局、滑动范围、复制与键盘修正。面向 DSHBox 1.4+/1.5.x、DSH 0.2.x、Android 10+；实测 1.5.1 / 0.2.1-rc.5 / Android 14。'
+  en: 'DSHBox sidebar enhancement: 45–100% width, scene presets, balance privacy/warning/auto-hide with a low-balance dot, reading density, accent colors, multi-wallet display, settings backup and diagnostics, Chinese/English UI; draggable ☰, left/right layout, adjustable swipe zone, copy and keyboard fixes. Targets DSHBox 1.4+/1.5.x, DSH 0.2.x and Android 10+; tested on 1.5.1 / 0.2.1-rc.5 / Android 14.'
+  zh: 'DSHBox 侧边栏增强：45–100% 宽度、场景预设、余额隐私/预警/自动隐藏与低额红点、阅读密度、强调色、多钱包显示、设置备份与诊断、中英文界面；☰ 拖动、左右布局、滑动范围、复制与键盘修正。面向 DSHBox 1.4+/1.5.x、DSH 0.2.x、Android 10+；实测 1.5.1 / 0.2.1-rc.5 / Android 14。'
