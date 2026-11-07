@@ -64,6 +64,7 @@ Grouped by category; every entry links to its own repository and shows its insta
 ### UI Enhancements
 
 - [omdsh-dev/DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) - Full sidebar workbench with file rendering and editing, terminal, Git, and subagents; third-party plugins can register new tabs.
+- [yinfenAce/dsh-sidebar-optimization#侧边栏优化](https://github.com/yinfenAce/dsh-sidebar-optimization) - Sidebar optimization for DSHBox: settings card with live preview: 45–80% width (presets 50/60/70), adjustable swipe zone 20–80% with a live guide, tap-outside/session close, free scroll, no tap focus ring, optional DeepSeek brand hiding, optional two-decimal balance with custom label and quick usage/top-up actions, draggable ☰, left/right layout swap, working copy buttons, view-switch animation, long-chat performance and keyboard follow. Targets DSHBox 1.4+/1.5.x, DSH 0.2.x and Android 10+; tested on 1.5.1 / 0.2.1-rc.5 / Android 14.
 - [zhu1090093659/dsh-web#packages/dsh-task-board](https://github.com/zhu1090093659/dsh-web/tree/main/packages/dsh-task-board) - Task board for the dsh web GUI: a sidebar multi-column kanban whose cards run in real DSH agent sessions and can also be scheduled with cron expressions, executed host-side even with the browser closed.
 
 ### Usage & Billing

@@ -59,6 +59,7 @@
 ### 🎨 UI 增强
 
 - [omdsh-dev/DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) — 侧边栏完整工作台：内置文件渲染编辑、终端、Git 与子代理，支持三方插件注册新 Tab。
+- [yinfenAce/dsh-sidebar-optimization#侧边栏优化](https://github.com/yinfenAce/dsh-sidebar-optimization) — DSHBox 侧边栏优化：设置卡片 + 实时预览：45–80% 宽度（预设 50/60/70）、20–80% 滑动范围可调 + 蓝色提示、点空白/点会话关闭、整列自由滚动、去点按焦点框、可选隐藏 DeepSeek 标识、可选两位小数余额 + 自定义标签 + 用量/充值快捷菜单、☰ 长按拖动吸边、左右布局互换、可用的复制按钮、视图切换动画、长会话性能与键盘跟随。面向 DSHBox 1.4+/1.5.x、DSH 0.2.x、Android 10+；实测 1.5.1 / 0.2.1-rc.5 / Android 14。
 - [zhu1090093659/dsh-web#packages/dsh-task-board](https://github.com/zhu1090093659/dsh-web/tree/main/packages/dsh-task-board) — 侧边栏多列任务看板：卡片交给真实 DSH 智能体会话执行，支持 cron 定时（Host 侧到点执行，关浏览器也生效）。
 
 ### 💰 用量与计费
