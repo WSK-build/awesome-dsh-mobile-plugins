@@ -1,0 +1,6 @@
+url: https://github.com/yinfenAce/dsh-sidebar-optimization
+name: "yinfenAce/dsh-sidebar-optimization#侧边栏优化"
+category: ui
+description:
+  en: Sidebar optimization for DSHBox: settings card with live preview: 45–80% width (presets 50/60/70), left-third swipe open (experimental), tap-outside/session close, free scroll, no tap focus ring, optional DeepSeek brand hiding, optional two-decimal balance with custom label (only with brand hidden), draggable ☰, working copy buttons, view-switch animation, long-chat performance and keyboard follow.
+  zh: DSHBox 侧边栏优化：设置卡片 + 实时预览：45–80% 宽度（预设 50/60/70）、左侧 1/3 滑动呼出（实验性）、点空白/点会话关闭、整列自由滚动、去点按焦点框、可选隐藏 DeepSeek 标识、可选两位小数余额 + 自定义标签（仅隐藏时显示）、☰ 长按拖动吸边、可用的复制按钮、视图切换动画、长会话性能与键盘跟随。
